@@ -313,13 +313,38 @@ class _ProductsTabState extends State<ProductsTab> {
                 ),
               ElevatedButton(
                 onPressed: () async {
+                  // Validate fields before saving
+                  if (nameController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      const SnackBar(content: Text('Product name is required')),
+                    );
+                    return;
+                  }
+                  final price = double.tryParse(priceController.text);
+                  if (price == null || price <= 0) {
+                    ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      const SnackBar(content: Text('Enter a valid price greater than 0')),
+                    );
+                    return;
+                  }
+                  final stock = int.tryParse(stockController.text);
+                  if (stock == null || stock < 0) {
+                    ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      const SnackBar(content: Text('Stock must be 0 or more')),
+                    );
+                    return;
+                  }
                   try {
                     final body = {
-                      'name': nameController.text,
-                      'description': descriptionController.text,
-                      'price': double.tryParse(priceController.text) ?? 0,
-                      'stock': int.tryParse(stockController.text) ?? 0,
-                      'category': categoryController.text,
+                      'name': nameController.text.trim(),
+                      'description': descriptionController.text.trim().isEmpty
+                          ? null
+                          : descriptionController.text.trim(),
+                      'price': price,
+                      'stock': stock,
+                      'category': categoryController.text.trim().isEmpty
+                          ? null
+                          : categoryController.text.trim(),
                       'image_url': imageUrlController.text.trim().isEmpty
                           ? null
                           : imageUrlController.text.trim(),

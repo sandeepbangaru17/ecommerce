@@ -17,6 +17,7 @@ class AddToCartButton extends StatelessWidget {
   int get _quantity => cart[product.id] ?? 0;
 
   void _addItem() {
+    if (_quantity >= product.stock) return; // respect stock limit
     cart[product.id] = _quantity + 1;
     onCartChanged?.call();
   }
@@ -102,12 +103,14 @@ class AddToCartButton extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: _addItem,
+            onTap: _quantity >= product.stock ? null : _addItem,
             child: Container(
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: CustomerAppTheme.primaryGreen,
+                color: _quantity >= product.stock
+                    ? CustomerAppTheme.textSecondary.withValues(alpha: 0.3)
+                    : CustomerAppTheme.primaryGreen,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Icon(
