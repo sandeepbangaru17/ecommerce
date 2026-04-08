@@ -3,7 +3,7 @@ import '../api/api_client.dart';
 import '../models/models.dart';
 import '../theme/customer_app_theme.dart';
 import '../utils/formatters.dart';
-import '../utils/product_visuals.dart';
+import '../utils/product_visuals.dart' show ProductEmojiDisplay;
 import '../widgets/add_to_cart_button.dart';
 
 class CartScreen extends StatefulWidget {
@@ -266,17 +266,12 @@ class _CartScreenState extends State<CartScreen> {
             ),
             child: Row(
               children: [
-                ClipRRect(
+                ProductEmojiDisplay(
+                  product: entry.key,
+                  width: 60,
+                  height: 60,
+                  emojiSize: 28,
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    (entry.key.imageUrl != null && entry.key.imageUrl!.isNotEmpty)
-                        ? entry.key.imageUrl!
-                        : ProductVisuals.fallbackImageUrl(entry.key),
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _buildItemPlaceholder(),
-                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

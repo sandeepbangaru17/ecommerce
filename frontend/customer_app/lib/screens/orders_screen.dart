@@ -101,6 +101,63 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
   }
 
+  /// Returns a best-guess emoji for an order item using its product name.
+  String _productEmoji(String? productName) {
+    if (productName == null) return '🛒';
+    final n = productName.toLowerCase();
+    if (n.contains('apple') || n.contains('fruit')) return '🍎';
+    if (n.contains('banana') || n.contains('kela')) return '🍌';
+    if (n.contains('mango') || n.contains('aam')) return '🥭';
+    if (n.contains('orange') || n.contains('santra')) return '🍊';
+    if (n.contains('grape') || n.contains('angoor')) return '🍇';
+    if (n.contains('watermelon')) return '🍉';
+    if (n.contains('strawberry')) return '🍓';
+    if (n.contains('lemon') || n.contains('nimbu')) return '🍋';
+    if (n.contains('tomato') || n.contains('tamatar')) return '🍅';
+    if (n.contains('onion') || n.contains('pyaz')) return '🧅';
+    if (n.contains('potato') || n.contains('aloo')) return '🥔';
+    if (n.contains('carrot') || n.contains('gajar')) return '🥕';
+    if (n.contains('broccoli') || n.contains('gobi')) return '🥦';
+    if (n.contains('spinach') || n.contains('palak')) return '🥬';
+    if (n.contains('capsicum') || n.contains('pepper')) return '🫑';
+    if (n.contains('corn') || n.contains('makka')) return '🌽';
+    if (n.contains('cucumber') || n.contains('kheera')) return '🥒';
+    if (n.contains('garlic') || n.contains('lahsun')) return '🧄';
+    if (n.contains('ginger') || n.contains('adrak')) return '🫚';
+    if (n.contains('milk') || n.contains('doodh')) return '🥛';
+    if (n.contains('cheese') || n.contains('paneer')) return '🧀';
+    if (n.contains('butter') || n.contains('makhan')) return '🧈';
+    if (n.contains('curd') || n.contains('dahi') || n.contains('yogurt')) return '🥛';
+    if (n.contains('ghee')) return '🫙';
+    if (n.contains('egg') || n.contains('anda')) return '🥚';
+    if (n.contains('bread') || n.contains('pav') || n.contains('bun')) return '🍞';
+    if (n.contains('cake') || n.contains('pastry')) return '🎂';
+    if (n.contains('biscuit') || n.contains('cookie')) return '🍪';
+    if (n.contains('roti') || n.contains('chapati') || n.contains('naan')) return '🫓';
+    if (n.contains('rice') || n.contains('chawal')) return '🍚';
+    if (n.contains('dal') || n.contains('lentil') || n.contains('chana')) return '🫘';
+    if (n.contains('flour') || n.contains('atta') || n.contains('wheat')) return '🌾';
+    if (n.contains('chicken') || n.contains('murgi')) return '🍗';
+    if (n.contains('mutton') || n.contains('lamb') || n.contains('beef')) return '🥩';
+    if (n.contains('fish') || n.contains('machli')) return '🐟';
+    if (n.contains('prawn') || n.contains('shrimp') || n.contains('jhinga')) return '🦐';
+    if (n.contains('coffee') || n.contains('espresso')) return '☕';
+    if (n.contains('tea') || n.contains('chai')) return '🍵';
+    if (n.contains('juice') || n.contains('smoothie')) return '🧃';
+    if (n.contains('water') || n.contains('paani')) return '💧';
+    if (n.contains('soda') || n.contains('cola') || n.contains('cold drink')) return '🥤';
+    if (n.contains('oil') || n.contains('ghee') || n.contains('tel')) return '🫙';
+    if (n.contains('salt') || n.contains('namak')) return '🧂';
+    if (n.contains('sugar') || n.contains('chini')) return '🍬';
+    if (n.contains('honey') || n.contains('shahad')) return '🍯';
+    if (n.contains('chilli') || n.contains('mirchi') || n.contains('masala') || n.contains('spice')) return '🌶️';
+    if (n.contains('chips') || n.contains('namkeen') || n.contains('bhujia')) return '🍟';
+    if (n.contains('popcorn')) return '🍿';
+    if (n.contains('noodle') || n.contains('pasta') || n.contains('maggi')) return '🍜';
+    if (n.contains('vegetable') || n.contains('sabzi')) return '🥦';
+    return '🛒';
+  }
+
   String _formatOrderDate(DateTime date) {
     const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -264,33 +321,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ),
             child: Row(
               children: [
-                // Product image or placeholder
+                // Product emoji display
                 Container(
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: CustomerAppTheme.addCartBg,
+                    color: const Color(0xFFF1F8E9),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: item.productImageUrl != null &&
-                          item.productImageUrl!.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            item.productImageUrl!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(
-                              Icons.eco_rounded,
-                              color: CustomerAppTheme.primaryGreen,
-                              size: 22,
-                            ),
-                          ),
-                        )
-                      : const Icon(
-                          Icons.eco_rounded,
-                          color: CustomerAppTheme.primaryGreen,
-                          size: 22,
-                        ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    _productEmoji(item.productName),
+                    style: const TextStyle(fontSize: 22),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

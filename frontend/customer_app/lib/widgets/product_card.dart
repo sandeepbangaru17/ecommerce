@@ -182,8 +182,6 @@ class ProductCard extends StatelessWidget {
   }
 }
 
-/// Displays a product image: real URL if available, otherwise
-/// a category-matched Unsplash fallback.
 class _ProductImage extends StatelessWidget {
   final Product product;
 
@@ -191,45 +189,19 @@ class _ProductImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = (product.imageUrl != null && product.imageUrl!.isNotEmpty)
-        ? product.imageUrl!
-        : ProductVisuals.fallbackImageUrl(product);
-
-    return Image.network(
-      url,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      loadingBuilder: (_, child, progress) {
-        if (progress == null) return child;
-        return Container(
-          color: CustomerAppTheme.addCartBg,
-          child: Center(
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                value: progress.expectedTotalBytes != null
-                    ? progress.cumulativeBytesLoaded /
-                        progress.expectedTotalBytes!
-                    : null,
-                color: CustomerAppTheme.primaryGreen,
-              ),
-            ),
-          ),
-        );
-      },
-      errorBuilder: (_, __, ___) => Container(
-        color: CustomerAppTheme.addCartBg,
-        child: const Center(
-          child: Icon(
-            Icons.eco_rounded,
-            color: CustomerAppTheme.primaryGreen,
-            size: 32,
-          ),
+    // If a real image URL is set, load it; otherwise show emoji
+    if (product.imageUrl != null && product.imageUrl!.isNotEmpty) {
+      return Image.network(
+        product.imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (_, __, ___) => ProductEmojiDisplay(
+          product: product,
+          emojiSize: 36,
         ),
-      ),
-    );
+      );
+    }
+    return ProductEmojiDisplay(product: product, emojiSize: 36);
   }
 }

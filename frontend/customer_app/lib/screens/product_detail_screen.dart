@@ -3,7 +3,7 @@ import '../api/api_client.dart';
 import '../models/models.dart';
 import '../theme/customer_app_theme.dart';
 import '../utils/formatters.dart';
-import '../utils/product_visuals.dart';
+import '../utils/product_visuals.dart' show ProductVisuals;
 import 'cart_screen.dart';
 import 'login_screen.dart';
 
@@ -170,13 +170,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildImagePanel(Product product) {
-    final imageUrl = (product.imageUrl != null && product.imageUrl!.isNotEmpty)
-        ? product.imageUrl!
-        : ProductVisuals.fallbackImageUrl(product);
-
     return Container(
       decoration: BoxDecoration(
-        color: CustomerAppTheme.cardBg,
+        color: ProductVisuals.fallbackColor(product),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -190,36 +186,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         borderRadius: BorderRadius.circular(20),
         child: AspectRatio(
           aspectRatio: 1,
-          child: Image.network(
-            imageUrl,
-            fit: BoxFit.cover,
-            loadingBuilder: (_, child, progress) {
-              if (progress == null) return child;
-              return Container(
-                color: CustomerAppTheme.addCartBg,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: CustomerAppTheme.primaryGreen,
-                    value: progress.expectedTotalBytes != null
-                        ? progress.cumulativeBytesLoaded /
-                            progress.expectedTotalBytes!
-                        : null,
+          child: product.imageUrl != null && product.imageUrl!.isNotEmpty
+              ? Image.network(
+                  product.imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Center(
+                    child: Text(
+                      ProductVisuals.fallbackEmoji(product),
+                      style: const TextStyle(fontSize: 100),
+                    ),
+                  ),
+                )
+              : Center(
+                  child: Text(
+                    ProductVisuals.fallbackEmoji(product),
+                    style: const TextStyle(fontSize: 100),
                   ),
                 ),
-              );
-            },
-            errorBuilder: (_, __, ___) => Container(
-              color: CustomerAppTheme.addCartBg,
-              child: Center(
-                child: Icon(
-                  Icons.eco_rounded,
-                  color: CustomerAppTheme.primaryGreen.withValues(alpha: 0.35),
-                  size: 80,
-                ),
-              ),
-            ),
-          ),
         ),
       ),
     );
