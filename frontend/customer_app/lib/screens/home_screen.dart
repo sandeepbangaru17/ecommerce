@@ -58,6 +58,79 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<bool> _promptLoginIfNeeded() async {
+    if (widget.apiClient.isAuthenticated) {
+      return true;
+    }
+
+    final loggedIn = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => LoginScreen(
+          apiClient: widget.apiClient,
+          returnToPrevious: true,
+        ),
+      ),
+    );
+
+    if (!mounted) return false;
+
+    if (loggedIn == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Signed in successfully')),
+      );
+      return true;
+    }
+
+    return widget.apiClient.isAuthenticated;
+  }
+
+  Future<void> _openOrders() async {
+    final canContinue = await _promptLoginIfNeeded();
+    if (!mounted || !canContinue) return;
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => OrdersScreen(apiClient: widget.apiClient),
+      ),
+    );
+  }
+
+  Future<void> _openCart() async {
+    final canContinue = await _promptLoginIfNeeded();
+    if (!mounted || !canContinue) return;
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CartScreen(
+          apiClient: widget.apiClient,
+          products: _products,
+          cart: _cart,
+        ),
+      ),
+    );
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _handleAccountAction() async {
+    if (widget.apiClient.isAuthenticated) {
+      widget.apiClient.setToken(null);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Signed out')),
+      );
+      setState(() {});
+      return;
+    }
+
+    await _promptLoginIfNeeded();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   void _addToCart(Product product) {
     setState(() {
       _cart[product.id] = (_cart[product.id] ?? 0) + 1;
@@ -120,44 +193,22 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           _TopIconButton(
             icon: Icons.receipt_long_outlined,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => OrdersScreen(apiClient: widget.apiClient),
-                ),
-              );
-            },
+            onTap: _openOrders,
           ),
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: _CartAction(
               count: _cartCount,
-              onTap: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => CartScreen(
-                      apiClient: widget.apiClient,
-                      products: _products,
-                      cart: _cart,
-                    ),
-                  ),
-                );
-                setState(() {});
-              },
+              onTap: _openCart,
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: _TopIconButton(
-              icon: Icons.logout_rounded,
-              onTap: () {
-                widget.apiClient.setToken(null);
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => LoginScreen(apiClient: widget.apiClient),
-                  ),
-                );
-              },
+              icon: widget.apiClient.isAuthenticated
+                  ? Icons.logout_rounded
+                  : Icons.person_outline_rounded,
+              onTap: _handleAccountAction,
             ),
           ),
         ],
