@@ -1,143 +1,164 @@
 import 'package:flutter/material.dart';
 
 class CustomerAppTheme {
-  static const Color canvas = Color(0xFFF7F1E8);
-  static const Color surface = Color(0xFFFFFBF5);
-  static const Color primary = Color(0xFF123524);
-  static const Color secondary = Color(0xFFB8893E);
-  static const Color accent = Color(0xFFD7A85D);
-  static const Color text = Color(0xFF1F1A17);
-  static const Color muted = Color(0xFF736A60);
-  static const Color success = Color(0xFF2E7D58);
-  static const Color danger = Color(0xFFB34336);
+  static const Color primaryGreen = Color(0xFF2E7D32);
+  static const Color accentLime = Color(0xFFA5D61D);
+  static const Color pageBg = Color(0xFFF8F9FA);
+  static const Color cardBg = Colors.white;
+  static const Color textPrimary = Color(0xFF1A1A1A);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color addCartBg = Color(0xFFE8F5E9);
+  static const Color filterActiveBg = Color(0xFF2E7D32);
+  static const Color danger = Color(0xFFE53935);
+  static const Color warning = Color(0xFFFFA726);
+  static const Color success = Color(0xFF2E7D32);
+
+  static const Color primary = primaryGreen;
+  static const Color secondary = accentLime;
+  static const Color canvas = pageBg;
+  static const Color text = textPrimary;
+  static const Color muted = textSecondary;
+  static const Color surface = cardBg;
 
   static ThemeData build() {
     final base = ThemeData(
       useMaterial3: true,
-      fontFamily: 'Georgia',
+      fontFamily: 'Poppins',
       colorScheme: const ColorScheme.light(
-        primary: primary,
-        secondary: secondary,
-        surface: surface,
+        primary: primaryGreen,
+        secondary: accentLime,
+        surface: cardBg,
         error: danger,
       ),
     );
 
     return base.copyWith(
-      scaffoldBackgroundColor: canvas,
+      scaffoldBackgroundColor: pageBg,
       textTheme: base.textTheme.copyWith(
         displayLarge: const TextStyle(
-          color: text,
+          color: textPrimary,
           fontWeight: FontWeight.w700,
-          letterSpacing: -1.2,
         ),
         displayMedium: const TextStyle(
-          color: text,
+          color: textPrimary,
           fontWeight: FontWeight.w700,
-          letterSpacing: -0.8,
         ),
         headlineMedium: const TextStyle(
-          color: text,
+          color: textPrimary,
           fontWeight: FontWeight.w700,
         ),
         titleLarge: const TextStyle(
-          color: text,
+          color: textPrimary,
           fontWeight: FontWeight.w700,
         ),
         bodyLarge: const TextStyle(
-          color: text,
+          color: textPrimary,
           height: 1.5,
         ),
         bodyMedium: const TextStyle(
-          color: muted,
+          color: textSecondary,
           height: 1.45,
         ),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
-        foregroundColor: text,
+        backgroundColor: primaryGreen,
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
+        titleTextStyle: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+        ),
       ),
       cardTheme: CardThemeData(
-        color: surface.withValues(alpha: 0.92),
+        color: cardBg,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-          side: BorderSide(
-            color: primary.withValues(alpha: 0.08),
-          ),
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surface,
-        labelStyle: const TextStyle(color: muted),
-        hintStyle: TextStyle(color: muted.withValues(alpha: 0.7)),
+        fillColor: cardBg,
+        labelStyle: const TextStyle(color: textSecondary),
+        hintStyle: const TextStyle(color: textSecondary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
-          borderSide: BorderSide(
-            color: primary.withValues(alpha: 0.1),
-          ),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
-          borderSide: BorderSide(
-            color: primary.withValues(alpha: 0.1),
-          ),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
-          borderSide: const BorderSide(color: secondary, width: 1.4),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: primaryGreen, width: 1.4),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
+          horizontal: 16,
+          vertical: 14,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          foregroundColor: surface,
-          backgroundColor: primary,
+          foregroundColor: primaryGreen,
+          backgroundColor: accentLime,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(30),
           ),
           textStyle: const TextStyle(
-            fontWeight: FontWeight.w700,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w600,
             letterSpacing: 0.2,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryGreen,
+          side: const BorderSide(color: primaryGreen),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: primary,
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+          foregroundColor: primaryGreen,
+          textStyle: const TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
       chipTheme: base.chipTheme.copyWith(
-        backgroundColor: primary.withValues(alpha: 0.06),
-        selectedColor: accent.withValues(alpha: 0.16),
-        side: BorderSide.none,
+        backgroundColor: cardBg,
+        selectedColor: primaryGreen,
+        side: const BorderSide(color: textSecondary),
         labelStyle: const TextStyle(
-          color: text,
-          fontWeight: FontWeight.w600,
+          fontFamily: 'Poppins',
+          color: textPrimary,
+          fontWeight: FontWeight.w500,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(30),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: primary,
-        contentTextStyle: const TextStyle(color: surface),
+        backgroundColor: primaryGreen,
+        contentTextStyle: const TextStyle(color: Colors.white),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(12),
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      dividerColor: primary.withValues(alpha: 0.08),
+      dividerColor: textSecondary.withValues(alpha: 0.2),
     );
   }
 }
