@@ -5,8 +5,13 @@ import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final ApiClient apiClient;
+  final bool returnToPrevious;
 
-  const LoginScreen({super.key, required this.apiClient});
+  const LoginScreen({
+    super.key,
+    required this.apiClient,
+    this.returnToPrevious = false,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -48,11 +53,15 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       widget.apiClient.setToken(response['access_token'] as String);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => HomeScreen(apiClient: widget.apiClient),
-        ),
-      );
+      if (widget.returnToPrevious && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop(true);
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => HomeScreen(apiClient: widget.apiClient),
+          ),
+        );
+      }
     } on ApiException catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -107,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         final wide = constraints.maxWidth >= 920;
                         return wide
                             ? Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Expanded(flex: 11, child: _buildBrandPanel()),
                                   const SizedBox(width: 28),
