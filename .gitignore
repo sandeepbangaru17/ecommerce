@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend
+.env
+*.log
+
+# Flutter
+*.g.dart
+.metadata
+.pub-cache/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+android/
+ios/
+linux/
+macos/
+windows/
+web/
+!frontend/admin_portal/windows/
+!frontend/admin_portal/windows/**
+!frontend/admin_portal/web/
+!frontend/admin_portal/web/**
+!frontend/admin_portal/.metadata
+
+# Supabase keys (DO NOT COMMIT)
+# See .env.example for the template
