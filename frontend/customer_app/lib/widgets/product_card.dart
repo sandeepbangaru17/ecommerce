@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../theme/customer_app_theme.dart';
+import '../utils/product_visuals.dart';
 import 'add_to_cart_button.dart';
 
 class ProductCard extends StatelessWidget {
@@ -16,8 +17,6 @@ class ProductCard extends StatelessWidget {
     this.onTap,
     this.onCartChanged,
   });
-
-  int get _quantity => cart[product.id] ?? 0;
 
   @override
   Widget build(BuildContext context) {
@@ -38,40 +37,31 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Image area ─────────────────────────────────────────
             Expanded(
               flex: 3,
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: Container(
-                      margin: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: CustomerAppTheme.addCartBg,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: product.imageUrl != null &&
-                                product.imageUrl!.isNotEmpty
-                            ? Image.network(
-                                product.imageUrl!,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                                errorBuilder: (_, __, ___) =>
-                                    _buildPlaceholder(),
-                              )
-                            : _buildPlaceholder(),
+                        child: _ProductImage(product: product),
                       ),
                     ),
                   ),
                   if (product.stock > 0)
                     Positioned(
-                      top: 16,
-                      left: 16,
+                      top: 14,
+                      left: 14,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                            horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
                           color: CustomerAppTheme.primaryGreen,
                           borderRadius: BorderRadius.circular(6),
@@ -89,9 +79,9 @@ class ProductCard extends StatelessWidget {
                   if (product.stock == 0)
                     Positioned.fill(
                       child: Container(
-                        margin: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.75),
+                          color: Colors.white.withValues(alpha: 0.78),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Center(
@@ -109,51 +99,52 @@ class ProductCard extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(
+
+            // ── Info area ───────────────────────────────────────────
+            // Uses Flexible (not Expanded) so it can shrink without overflowing
+            Flexible(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Text(
+                      product.name,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: CustomerAppTheme.textPrimary,
+                        height: 1.25,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 3),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          product.name,
+                          '₹${product.price.toStringAsFixed(0)}',
                           style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: CustomerAppTheme.textPrimary,
-                            height: 1.2,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: CustomerAppTheme.primaryGreen,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Text(
-                              '₹${product.price.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: CustomerAppTheme.primaryGreen,
-                              ),
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              '/unit',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: CustomerAppTheme.textSecondary,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(width: 2),
+                        Text(
+                          '/unit',
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: CustomerAppTheme.textSecondary,
+                          ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 6),
                     if (product.stock > 0)
                       AddToCartButton(
                         product: product,
@@ -163,10 +154,10 @@ class ProductCard extends StatelessWidget {
                     else
                       Container(
                         width: double.infinity,
-                        height: 32,
+                        height: 30,
                         decoration: BoxDecoration(
                           color: CustomerAppTheme.textSecondary
-                              .withValues(alpha: 0.15),
+                              .withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Center(
@@ -180,7 +171,6 @@ class ProductCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                    const SizedBox(height: 4),
                   ],
                 ),
               ),
@@ -190,13 +180,55 @@ class ProductCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildPlaceholder() {
-    return Center(
-      child: Icon(
-        Icons.eco,
-        color: CustomerAppTheme.primaryGreen.withValues(alpha: 0.25),
-        size: 36,
+/// Displays a product image: real URL if available, otherwise
+/// a category-matched Unsplash fallback.
+class _ProductImage extends StatelessWidget {
+  final Product product;
+
+  const _ProductImage({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    final url = (product.imageUrl != null && product.imageUrl!.isNotEmpty)
+        ? product.imageUrl!
+        : ProductVisuals.fallbackImageUrl(product);
+
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      loadingBuilder: (_, child, progress) {
+        if (progress == null) return child;
+        return Container(
+          color: CustomerAppTheme.addCartBg,
+          child: Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                value: progress.expectedTotalBytes != null
+                    ? progress.cumulativeBytesLoaded /
+                        progress.expectedTotalBytes!
+                    : null,
+                color: CustomerAppTheme.primaryGreen,
+              ),
+            ),
+          ),
+        );
+      },
+      errorBuilder: (_, __, ___) => Container(
+        color: CustomerAppTheme.addCartBg,
+        child: const Center(
+          child: Icon(
+            Icons.eco_rounded,
+            color: CustomerAppTheme.primaryGreen,
+            size: 32,
+          ),
+        ),
       ),
     );
   }

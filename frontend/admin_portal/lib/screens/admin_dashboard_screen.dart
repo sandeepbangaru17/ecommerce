@@ -40,12 +40,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Aurum Control Room',
+              'Gromuse Admin',
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             SizedBox(height: 2),
             Text(
-              'Admin operations',
+              'Store management',
               style: TextStyle(fontSize: 13, color: AdminAppTheme.muted),
             ),
           ],
@@ -102,7 +102,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'CONTROL SURFACE',
+                        'GROMUSE ADMIN',
                         style: TextStyle(
                           color: AdminAppTheme.primary,
                           fontWeight: FontWeight.w700,
@@ -111,9 +111,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                       ),
                       const SizedBox(height: 14),
                       Text(
-                        'A premium dashboard for catalog, pricing, and order movement.',
+                        'Manage your products, pricing and orders.',
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontSize: 34,
+                              fontSize: 28,
                             ),
                       ),
                       const SizedBox(height: 18),
@@ -158,6 +158,7 @@ class ProductsTab extends StatefulWidget {
 class _ProductsTabState extends State<ProductsTab> {
   List<Product> _products = [];
   bool _isLoading = true;
+  String? _loadError;
   String _searchQuery = '';
   String _selectedCategory = 'All';
 
@@ -168,8 +169,12 @@ class _ProductsTabState extends State<ProductsTab> {
   }
 
   Future<void> _loadProducts() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
     try {
+      // No is_active filter — admin sees all products including hidden ones
       final response = await widget.apiClient.get('/products');
       final products = (response as List<dynamic>)
           .map((entry) => Product.fromJson(entry as Map<String, dynamic>))
@@ -179,9 +184,18 @@ class _ProductsTabState extends State<ProductsTab> {
         _products = products;
         _isLoading = false;
       });
-    } catch (_) {
+    } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _isLoading = false);
+      setState(() {
+        _loadError = e.message;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadError = 'Failed to load products';
+        _isLoading = false;
+      });
     }
   }
 
@@ -339,6 +353,31 @@ class _ProductsTabState extends State<ProductsTab> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_loadError != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.cloud_off_rounded,
+                  size: 48, color: AdminAppTheme.muted),
+              const SizedBox(height: 16),
+              Text(_loadError!,
+                  style: const TextStyle(color: AdminAppTheme.muted),
+                  textAlign: TextAlign.center),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _loadProducts,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     final activeProducts = _products.where((product) => product.isActive).length;
@@ -602,6 +641,7 @@ class OrdersTab extends StatefulWidget {
 class _OrdersTabState extends State<OrdersTab> {
   List<Order> _orders = [];
   bool _isLoading = true;
+  String? _loadError;
 
   @override
   void initState() {
@@ -610,7 +650,10 @@ class _OrdersTabState extends State<OrdersTab> {
   }
 
   Future<void> _loadOrders() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
     try {
       final response = await widget.apiClient.get('/orders');
       final orders = (response as List<dynamic>)
@@ -621,9 +664,18 @@ class _OrdersTabState extends State<OrdersTab> {
         _orders = orders;
         _isLoading = false;
       });
-    } catch (_) {
+    } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _isLoading = false);
+      setState(() {
+        _loadError = e.message;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadError = 'Failed to load orders';
+        _isLoading = false;
+      });
     }
   }
 
@@ -765,6 +817,31 @@ class _OrdersTabState extends State<OrdersTab> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_loadError != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.cloud_off_rounded,
+                  size: 48, color: AdminAppTheme.muted),
+              const SizedBox(height: 16),
+              Text(_loadError!,
+                  style: const TextStyle(color: AdminAppTheme.muted),
+                  textAlign: TextAlign.center),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _loadOrders,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     final totalRevenue = _orders.fold<double>(

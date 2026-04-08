@@ -3,6 +3,7 @@ import '../api/api_client.dart';
 import '../models/models.dart';
 import '../theme/customer_app_theme.dart';
 import '../utils/formatters.dart';
+import '../utils/product_visuals.dart';
 import '../widgets/add_to_cart_button.dart';
 
 class CartScreen extends StatefulWidget {
@@ -110,15 +111,23 @@ class _CartScreenState extends State<CartScreen> {
       );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Order placed successfully'),
-          backgroundColor: CustomerAppTheme.primaryGreen,
-        ),
-      );
-      _localCart.clear();
+      // Clear the shared cart reference too
+      widget.cart?.clear();
       widget.onOrderPlaced?.call();
       Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
+              SizedBox(width: 8),
+              Text('Order placed successfully!'),
+            ],
+          ),
+          backgroundColor: CustomerAppTheme.primaryGreen,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     } on ApiException catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -259,16 +268,15 @@ class _CartScreenState extends State<CartScreen> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: entry.key.imageUrl != null &&
-                          entry.key.imageUrl!.isNotEmpty
-                      ? Image.network(
-                          entry.key.imageUrl!,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => _buildItemPlaceholder(),
-                        )
-                      : _buildItemPlaceholder(),
+                  child: Image.network(
+                    (entry.key.imageUrl != null && entry.key.imageUrl!.isNotEmpty)
+                        ? entry.key.imageUrl!
+                        : ProductVisuals.fallbackImageUrl(entry.key),
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _buildItemPlaceholder(),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

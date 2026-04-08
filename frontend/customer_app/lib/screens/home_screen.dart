@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      final response = await widget.apiClient.get('/products');
+      final response = await widget.apiClient.get('/products?is_active=true');
       final products = (response as List<dynamic>)
           .map((entry) => Product.fromJson(entry as Map<String, dynamic>))
           .toList();
@@ -111,6 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => OrdersScreen(apiClient: widget.apiClient),
       ),
     );
+
+    // Refresh orders when returning to home screen
+    if (mounted) _loadOrders();
   }
 
   Future<void> _openCart() async {
@@ -223,32 +226,52 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_error != null) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.cloud_off_rounded,
-                size: 48,
-                color: CustomerAppTheme.textSecondary,
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: CustomerAppTheme.textSecondary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.cloud_off_rounded,
+                  size: 36,
+                  color: CustomerAppTheme.textSecondary,
+                ),
               ),
-              const SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Unable to load products',
-                style: Theme.of(context).textTheme.titleLarge,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: CustomerAppTheme.textPrimary,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 _error!,
                 textAlign: TextAlign.center,
+                style: const TextStyle(color: CustomerAppTheme.textSecondary),
               ),
-              const SizedBox(height: 18),
-              ElevatedButton(
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
                 onPressed: _loadProducts,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Try Again'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: CustomerAppTheme.primaryGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-                child: const Text('Retry'),
               ),
             ],
           ),
@@ -549,14 +572,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 240,
+            height: 260,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: _products.take(5).length,
               itemBuilder: (context, index) {
                 final product = _products[index];
                 final screenWidth = MediaQuery.of(context).size.width;
-                final cardWidth = (screenWidth - 48 - 16) / 2.5;
+                // Each card is ~42% of screen width so 2.4 cards visible
+                final cardWidth = (screenWidth - 32) / 2.4;
                 return SizedBox(
                   width: cardWidth,
                   child: Padding(
@@ -667,7 +691,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisCount: columns,
               mainAxisSpacing: spacing,
               crossAxisSpacing: spacing,
-              childAspectRatio: 0.72,
+              childAspectRatio: 0.62,
             ),
             itemCount: _visibleProducts.length,
             itemBuilder: (context, index) {
@@ -754,14 +778,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 100,
+            height: 112,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: _orders.length > 5 ? 5 : _orders.length,
               itemBuilder: (context, index) {
                 final order = _orders[index];
                 return Container(
-                  width: 160,
+                  width: 168,
                   margin: const EdgeInsets.only(right: 12),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -809,7 +833,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       Text(
-                        '${order.items.length} items',
+                        '${order.itemCount} items',
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -920,6 +944,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => ProductDetailScreen(
           apiClient: widget.apiClient,
           product: product,
+          allProducts: _products,
           cart: _cart,
           onCartChanged: () => setState(() {}),
         ),

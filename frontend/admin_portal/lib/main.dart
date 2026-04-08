@@ -13,7 +13,7 @@ class AdminPortalApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Aurum Control Room',
+      title: 'Gromuse Admin',
       debugShowCheckedModeBanner: false,
       theme: AdminAppTheme.build(),
       home: AdminLoginScreen(apiClient: ApiClient()),

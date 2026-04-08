@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from typing import List, Optional
+from datetime import datetime
 from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
 from app.schemas.user import TokenData
 from app.services.auth import get_current_user, get_current_admin
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/products", tags=["Products"])
 @router.get("", response_model=List[ProductResponse])
 async def list_products(
     category: Optional[str] = None,
-    is_active: Optional[bool] = True,
+    is_active: Optional[bool] = None,
     limit: int = Query(default=50, le=100),
     offset: int = Query(default=0),
     db: DatabaseService = Depends(lambda: db_service),
@@ -87,7 +88,7 @@ async def update_product(
         )
 
     update_dict = {k: v for k, v in product_data.model_dump().items() if v is not None}
-    update_dict["updated_by"] = current_admin.user_id
+    update_dict["updated_at"] = datetime.utcnow().isoformat()
 
     product = db.service_update("products", product_id, update_dict)
     return product

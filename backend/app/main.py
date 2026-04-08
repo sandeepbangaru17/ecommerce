@@ -2,9 +2,16 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from supabase import create_client, Client
 from app.api import auth, products, orders
 from app.core.config import get_settings
+
+settings = get_settings()
+
+_origins = (
+    [o.strip() for o in settings.ALLOWED_ORIGINS.split(",")]
+    if settings.ALLOWED_ORIGINS != "*"
+    else ["*"]
+)
 
 app = FastAPI(
     title="Ecommerce API",
@@ -14,8 +21,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_origins,
+    allow_credentials=_origins != ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -33,7 +40,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Internal server error", "error": str(exc)},
+        content={"detail": "Internal server error"},
     )
 
 

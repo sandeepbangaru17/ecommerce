@@ -17,6 +17,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
   String? _errorMessage;
 
   @override
@@ -94,12 +95,20 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.admin_panel_settings,
-                  size: 48,
-                  color: AdminAppTheme.primaryGreen,
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8F5E9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.admin_panel_settings_outlined,
+                    size: 36,
+                    color: AdminAppTheme.primaryGreen,
+                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 const Text(
                   'Gromuse Admin',
                   style: TextStyle(
@@ -109,7 +118,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   ),
                 ),
                 const Text(
-                  'Manage your store',
+                  'Sign in to manage your store',
                   style: TextStyle(
                     fontSize: 13,
                     color: AdminAppTheme.textSecondary,
@@ -141,10 +150,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           hintText: "Password",
                           prefixIcon: const Icon(Icons.lock_outlined),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: AdminAppTheme.textSecondary,
+                              size: 20,
+                            ),
+                            onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword),
+                          ),
                           filled: true,
                           fillColor: AdminAppTheme.pageBg,
                           border: OutlineInputBorder(

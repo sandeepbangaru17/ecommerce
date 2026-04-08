@@ -26,28 +26,6 @@ def enrich_order_items(items: List[dict], db: DatabaseService) -> List[dict]:
     return enriched_items
 
 
-def calculate_total(items: List, db: DatabaseService) -> float:
-    total = 0.0
-    for item in items:
-        product = db.service_get_by_id("products", item.product_id)
-        if not product:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Product {item.product_id} not found",
-            )
-        if not product.get("is_active", True):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Product {item.product_id} not available",
-            )
-        if product.get("stock", 0) < item.quantity:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Insufficient stock for product {item.product_id}",
-            )
-        total += item.unit_price * item.quantity
-    return total
-
 
 @router.post("", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
 async def create_order(

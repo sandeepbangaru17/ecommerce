@@ -14,7 +14,7 @@ class EcommerceApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final apiClient = ApiClient();
     return MaterialApp(
-      title: 'Aurum Collective',
+      title: 'Gromuse',
       debugShowCheckedModeBanner: false,
       theme: CustomerAppTheme.build(),
       home: HomeScreen(apiClient: apiClient),

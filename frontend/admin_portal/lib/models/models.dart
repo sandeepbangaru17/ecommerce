@@ -97,6 +97,7 @@ class Order {
   final DateTime createdAt;
   final DateTime? updatedAt;
   final List<OrderItem> items;
+  final int itemCount;
 
   Order({
     required this.id,
@@ -109,9 +110,14 @@ class Order {
     required this.createdAt,
     this.updatedAt,
     this.items = const [],
+    this.itemCount = 0,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
+    final items = (json['items'] as List<dynamic>?)
+            ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
     return Order(
       id: json['id'] as String,
       userId: json['user_id'] as String,
@@ -124,10 +130,8 @@ class Order {
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
           : null,
-      items: (json['items'] as List<dynamic>?)
-              ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      items: items,
+      itemCount: json['item_count'] as int? ?? items.length,
     );
   }
 

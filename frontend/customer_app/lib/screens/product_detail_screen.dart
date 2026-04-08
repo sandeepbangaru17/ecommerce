@@ -3,12 +3,14 @@ import '../api/api_client.dart';
 import '../models/models.dart';
 import '../theme/customer_app_theme.dart';
 import '../utils/formatters.dart';
+import '../utils/product_visuals.dart';
 import 'cart_screen.dart';
 import 'login_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final ApiClient apiClient;
   final Product product;
+  final List<Product> allProducts;
   final Map<String, int>? cart;
   final VoidCallback? onCartChanged;
 
@@ -16,6 +18,7 @@ class ProductDetailScreen extends StatefulWidget {
     super.key,
     required this.apiClient,
     required this.product,
+    this.allProducts = const [],
     this.cart,
     this.onCartChanged,
   });
@@ -76,11 +79,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
 
     if (!mounted) return;
+    // Use allProducts so all cart items can be displayed correctly
+    final products = widget.allProducts.isNotEmpty
+        ? widget.allProducts
+        : [widget.product];
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CartScreen(
           apiClient: widget.apiClient,
-          products: [widget.product],
+          products: products,
           cart: _localCart,
           onOrderPlaced: () {
             Navigator.of(context).pop();
@@ -163,6 +170,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildImagePanel(Product product) {
+    final imageUrl = (product.imageUrl != null && product.imageUrl!.isNotEmpty)
+        ? product.imageUrl!
+        : ProductVisuals.fallbackImageUrl(product);
+
     return Container(
       decoration: BoxDecoration(
         color: CustomerAppTheme.cardBg,
@@ -179,26 +190,36 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         borderRadius: BorderRadius.circular(20),
         child: AspectRatio(
           aspectRatio: 1,
-          child: product.imageUrl != null && product.imageUrl!.isNotEmpty
-              ? Image.network(
-                  product.imageUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
-                )
-              : _buildPlaceholderImage(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholderImage() {
-    return Container(
-      color: CustomerAppTheme.addCartBg,
-      child: Center(
-        child: Icon(
-          Icons.eco,
-          color: CustomerAppTheme.primaryGreen.withValues(alpha: 0.3),
-          size: 80,
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            loadingBuilder: (_, child, progress) {
+              if (progress == null) return child;
+              return Container(
+                color: CustomerAppTheme.addCartBg,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: CustomerAppTheme.primaryGreen,
+                    value: progress.expectedTotalBytes != null
+                        ? progress.cumulativeBytesLoaded /
+                            progress.expectedTotalBytes!
+                        : null,
+                  ),
+                ),
+              );
+            },
+            errorBuilder: (_, __, ___) => Container(
+              color: CustomerAppTheme.addCartBg,
+              child: Center(
+                child: Icon(
+                  Icons.eco_rounded,
+                  color: CustomerAppTheme.primaryGreen.withValues(alpha: 0.35),
+                  size: 80,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
