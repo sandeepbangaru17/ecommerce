@@ -26,6 +26,7 @@ class _CartScreenState extends State<CartScreen> {
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   final _notesController = TextEditingController();
+  String _paymentMethod = 'cod';
   bool _isLoading = false;
 
   @override
@@ -347,9 +348,13 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 18),
             TextFormField(
               controller: _addressController,
-              maxLines: 2,
+              minLines: 3,
+              maxLines: 4,
+              textInputAction: TextInputAction.newline,
               decoration: const InputDecoration(
                 labelText: 'Shipping address',
+                hintText: 'House / flat, street, area, city, state, PIN code',
+                alignLabelWithHint: true,
                 prefixIcon: Icon(Icons.location_on_outlined),
               ),
               validator: (value) =>
@@ -373,6 +378,49 @@ class _CartScreenState extends State<CartScreen> {
               decoration: const InputDecoration(
                 labelText: 'Notes for delivery',
                 prefixIcon: Icon(Icons.edit_note_outlined),
+              ),
+            ),
+            const SizedBox(height: 18),
+            const Text(
+              'Payment method',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: CustomerAppTheme.text,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: CustomerAppTheme.primary.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: CustomerAppTheme.primary.withValues(alpha: 0.12),
+                ),
+              ),
+              child: RadioListTile<String>(
+                value: 'cod',
+                groupValue: _paymentMethod,
+                activeColor: CustomerAppTheme.primary,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                title: const Text(
+                  'Cash on delivery',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: CustomerAppTheme.text,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Pay when the order reaches your address.',
+                ),
+                secondary: const Icon(Icons.payments_outlined),
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() => _paymentMethod = value);
+                },
               ),
             ),
             const SizedBox(height: 22),
