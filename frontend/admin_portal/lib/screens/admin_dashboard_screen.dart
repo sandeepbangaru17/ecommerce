@@ -745,7 +745,7 @@ class _OrdersTabState extends State<OrdersTab> {
                 if (!dialogContext.mounted) return;
                 Navigator.pop(dialogContext);
               },
-              child: const Text('Deliver'),
+              child: const Text('Mark success'),
             ),
           if (detail.status != 'delivered' && detail.status != 'cancelled')
             TextButton(
