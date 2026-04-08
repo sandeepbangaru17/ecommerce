@@ -8,13 +8,15 @@ import '../widgets/add_to_cart_button.dart';
 class CartScreen extends StatefulWidget {
   final ApiClient apiClient;
   final List<Product> products;
-  final Map<String, int> cart;
+  final Map<String, int>? cart;
+  final VoidCallback? onOrderPlaced;
 
   const CartScreen({
     super.key,
     required this.apiClient,
     required this.products,
-    required this.cart,
+    this.cart,
+    this.onOrderPlaced,
   });
 
   @override
@@ -27,6 +29,13 @@ class _CartScreenState extends State<CartScreen> {
   final _phoneController = TextEditingController();
   final _notesController = TextEditingController();
   bool _isLoading = false;
+  late Map<String, int> _localCart;
+
+  @override
+  void initState() {
+    super.initState();
+    _localCart = widget.cart ?? {};
+  }
 
   @override
   void dispose() {
@@ -37,7 +46,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   List<MapEntry<Product, int>> get _cartItems {
-    return widget.cart.entries
+    return _localCart.entries
         .where((entry) => entry.value > 0)
         .map((entry) {
           final product = widget.products.firstWhere(
@@ -63,12 +72,12 @@ class _CartScreenState extends State<CartScreen> {
       );
 
   void _changeQuantity(Product product, int delta) {
-    final next = (widget.cart[product.id] ?? 0) + delta;
+    final next = (_localCart[product.id] ?? 0) + delta;
     setState(() {
       if (next <= 0) {
-        widget.cart.remove(product.id);
+        _localCart.remove(product.id);
       } else {
-        widget.cart[product.id] = next;
+        _localCart[product.id] = next;
       }
     });
   }
@@ -107,7 +116,8 @@ class _CartScreenState extends State<CartScreen> {
           backgroundColor: CustomerAppTheme.primaryGreen,
         ),
       );
-      widget.cart.clear();
+      _localCart.clear();
+      widget.onOrderPlaced?.call();
       Navigator.of(context).pop();
     } on ApiException catch (error) {
       if (!mounted) return;
