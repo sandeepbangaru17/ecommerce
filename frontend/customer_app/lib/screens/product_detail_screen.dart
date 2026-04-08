@@ -3,305 +3,474 @@ import '../api/api_client.dart';
 import '../models/models.dart';
 import '../theme/customer_app_theme.dart';
 import '../utils/formatters.dart';
-import '../utils/product_visuals.dart';
+import 'cart_screen.dart';
+import 'login_screen.dart';
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
   final ApiClient apiClient;
   final Product product;
+  final Map<String, int>? cart;
+  final VoidCallback? onCartChanged;
 
   const ProductDetailScreen({
     super.key,
     required this.apiClient,
     required this.product,
+    this.cart,
+    this.onCartChanged,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Product detail')),
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFFFF9F0),
-              CustomerAppTheme.canvas,
-            ],
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  late Map<String, int> _localCart;
+  int _quantity = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _localCart = widget.cart ?? {};
+    _quantity = _localCart[widget.product.id] ?? 1;
+  }
+
+  void _addToCart() async {
+    if (widget.cart != null) {
+      final current = widget.cart![widget.product.id] ?? 0;
+      widget.cart![widget.product.id] = current + _quantity;
+      widget.onCartChanged?.call();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_quantity}x ${widget.product.name} added to cart'),
+          backgroundColor: CustomerAppTheme.primaryGreen,
+          action: SnackBarAction(
+            label: 'View Cart',
+            textColor: Colors.white,
+            onPressed: () => _goToCart(),
           ),
         ),
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final wide = constraints.maxWidth >= 920;
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1180),
-                  child: wide
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(flex: 11, child: _buildVisualPanel()),
-                            const SizedBox(width: 24),
-                            Expanded(flex: 10, child: _buildInfoPanel(context)),
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildVisualPanel(),
-                            const SizedBox(height: 24),
-                            _buildInfoPanel(context),
-                          ],
-                        ),
-                ),
-              );
-            },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_quantity}x ${widget.product.name} added to cart'),
+          backgroundColor: CustomerAppTheme.primaryGreen,
+        ),
+      );
+    }
+  }
+
+  Future<void> _goToCart() async {
+    if (!widget.apiClient.isAuthenticated) {
+      final loggedIn = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => LoginScreen(
+            apiClient: widget.apiClient,
+            returnToPrevious: true,
           ),
+        ),
+      );
+      if (loggedIn != true) return;
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CartScreen(
+          apiClient: widget.apiClient,
+          products: [widget.product],
+          cart: _localCart,
         ),
       ),
     );
   }
 
-  Widget _buildVisualPanel() {
-    return Container(
-      height: 480,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(34),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFF1DFC7),
-            Color(0xFFE4CAA0),
-          ],
-        ),
+  Widget _buildPriceDisplay(double price, {double fontSize = 32}) {
+    return Text(
+      '₹${price.toStringAsFixed(0)}',
+      style: TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        color: CustomerAppTheme.primaryGreen,
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -50,
-            top: -36,
-            child: Container(
-              width: 220,
-              height: 220,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.12),
-              ),
-            ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final product = widget.product;
+    final inStock = product.stock > 0;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth >= 768;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          isWide ? 'Product Details' : product.name,
+          style: const TextStyle(fontSize: 16),
+        ),
+        backgroundColor: CustomerAppTheme.primaryGreen,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite_border),
+            onPressed: () {},
           ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: ProductArtwork(
-                product: product,
-                borderRadius: BorderRadius.circular(28),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 22,
-            bottom: 22,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                product.stock > 10 ? 'Bestseller pick' : 'Limited batch',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () {},
           ),
         ],
       ),
+      body: Container(
+        color: CustomerAppTheme.pageBg,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: isWide
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: _buildImagePanel(product),
+                      ),
+                      const SizedBox(width: 32),
+                      Expanded(
+                        flex: 2,
+                        child: _buildInfoPanel(product, inStock),
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildImagePanel(product),
+                      const SizedBox(height: 24),
+                      _buildInfoPanel(product, inStock),
+                    ],
+                  ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildInfoPanel(BuildContext context) {
-    final inStock = product.stock > 0;
+  Widget _buildImagePanel(Product product) {
+    return Container(
+      decoration: BoxDecoration(
+        color: CustomerAppTheme.cardBg,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 16,
+            color: Colors.black.withValues(alpha: 0.08),
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: product.imageUrl != null && product.imageUrl!.isNotEmpty
+              ? Image.network(
+                  product.imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
+                )
+              : _buildPlaceholderImage(),
+        ),
+      ),
+    );
+  }
 
+  Widget _buildPlaceholderImage() {
+    return Container(
+      color: CustomerAppTheme.addCartBg,
+      child: Center(
+        child: Icon(
+          Icons.eco,
+          color: CustomerAppTheme.primaryGreen.withValues(alpha: 0.3),
+          size: 80,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoPanel(Product product, bool inStock) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: CustomerAppTheme.primaryGreen.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            product.category ?? 'Grocery',
+            style: const TextStyle(
+              color: CustomerAppTheme.primaryGreen,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          product.name,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: CustomerAppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
           children: [
-            if (product.category != null) Chip(label: Text(product.category!)),
-            Chip(
-              backgroundColor:
-                  (inStock ? CustomerAppTheme.success : CustomerAppTheme.danger)
-                      .withValues(alpha: 0.12),
-              label: Text(inStock ? 'In stock' : 'Currently unavailable'),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: CustomerAppTheme.accentLime,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.star,
+                    color: CustomerAppTheme.primaryGreen,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    "4.5",
+                    style: TextStyle(
+                      color: CustomerAppTheme.primaryGreen,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              "(15 reviews)",
+              style: TextStyle(
+                color: CustomerAppTheme.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: inStock
+                    ? CustomerAppTheme.success.withValues(alpha: 0.1)
+                    : CustomerAppTheme.danger.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                inStock ? "In Stock" : "Out of Stock",
+                style: TextStyle(
+                  color: inStock
+                      ? CustomerAppTheme.success
+                      : CustomerAppTheme.danger,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        Text(
-          product.name,
-          style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 40),
-        ),
+        _buildPriceDisplay(product.price),
+        const SizedBox(height: 20),
+        const Divider(),
         const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.84),
-            borderRadius: BorderRadius.circular(28),
+        Text(
+          "Description",
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: CustomerAppTheme.textPrimary,
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Premium price',
-                      style: TextStyle(
-                        color: CustomerAppTheme.muted,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      formatInr(product.price),
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            color: CustomerAppTheme.primary,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: CustomerAppTheme.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Text(
-                  '${product.stock} units',
-                  style: const TextStyle(
-                    color: CustomerAppTheme.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          product.description ??
+              'Fresh product delivered to your door. We ensure quality and freshness in every order.',
+          style: TextStyle(
+            color: CustomerAppTheme.textSecondary,
+            fontSize: 14,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: CustomerAppTheme.cardBg,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 12,
+                color: Colors.black.withValues(alpha: 0.06),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          product.description ??
-              'A considered catalog entry presented with richer retail framing for a more premium storefront experience.',
-          style: Theme.of(context).textTheme.bodyLarge,
+          child: Column(
+            children: [
+              _buildInfoRow(
+                  Icons.local_shipping_outlined, "Free delivery above ₹499"),
+              const SizedBox(height: 12),
+              _buildInfoRow(Icons.access_time, "Express delivery in 10 mins"),
+              const SizedBox(height: 12),
+              _buildInfoRow(
+                  Icons.payments_outlined, "Cash on delivery available"),
+              const SizedBox(height: 12),
+              _buildInfoRow(Icons.verified_outlined, "Quality guaranteed"),
+            ],
+          ),
         ),
         const SizedBox(height: 24),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: ProductVisuals.highlights(product)
-              .map(
-                (item) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.86),
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Text(
-                    item,
-                    style: const TextStyle(
-                      color: CustomerAppTheme.text,
-                      fontWeight: FontWeight.w700,
+        if (inStock) ...[
+          const Text(
+            "Quantity",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: CustomerAppTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: CustomerAppTheme.addCartBg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    if (_quantity > 1) setState(() => _quantity--);
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: CustomerAppTheme.primaryGreen,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.remove,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-              )
-              .toList(),
-        ),
-        const SizedBox(height: 24),
-        const Wrap(
-          spacing: 14,
-          runSpacing: 14,
-          children: [
-            _DetailCallout(
-              icon: Icons.local_shipping_outlined,
-              title: 'Concierge delivery',
-              subtitle: 'Cash on delivery supported',
-            ),
-            _DetailCallout(
-              icon: Icons.verified_outlined,
-              title: 'Curated inventory',
-              subtitle: 'Catalog managed by admin team',
-            ),
-            _DetailCallout(
-              icon: Icons.devices_outlined,
-              title: 'Responsive journey',
-              subtitle: 'Built for desktop and mobile',
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _DetailCallout extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _DetailCallout({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minWidth: 210, maxWidth: 260),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.86),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: CustomerAppTheme.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, color: CustomerAppTheme.primary),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: CustomerAppTheme.text,
-                    fontWeight: FontWeight.w700,
+                Container(
+                  width: 50,
+                  alignment: Alignment.center,
+                  child: Text(
+                    '$_quantity',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: CustomerAppTheme.primaryGreen,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(subtitle),
+                GestureDetector(
+                  onTap: () {
+                    if (_quantity < product.stock) setState(() => _quantity++);
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: CustomerAppTheme.primaryGreen,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
         ],
-      ),
+        const SizedBox(height: 24),
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: inStock ? _addToCart : null,
+                icon: const Icon(Icons.shopping_bag_outlined),
+                label: Text(
+                    "Add to Cart (₹${(product.price * _quantity).toStringAsFixed(0)})"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomerAppTheme.primaryGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: inStock ? _goToCart : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomerAppTheme.accentLime,
+                  foregroundColor: CustomerAppTheme.primaryGreen,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: const Text(
+                  "Buy Now",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: CustomerAppTheme.addCartBg,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: CustomerAppTheme.primaryGreen, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          text,
+          style: const TextStyle(
+            color: CustomerAppTheme.textPrimary,
+            fontSize: 14,
+          ),
+        ),
+      ],
     );
   }
 }
