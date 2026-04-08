@@ -51,35 +51,41 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
           color: Colors.white,
         ),
       ),
-      flexibleSpace: Container(
-        padding: const EdgeInsets.only(left: 56, right: 16, top: 50),
-        child: Container(
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: TextField(
-            onChanged: onSearchChanged,
-            style: const TextStyle(fontSize: 13),
-            decoration: const InputDecoration(
-              hintText: "Search groceries...",
-              hintStyle: TextStyle(
-                color: Color(0xFF9E9E9E),
-                fontSize: 13,
+      actions: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: CustomerAppTheme.accentLime.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.bolt,
+                      color: CustomerAppTheme.accentLime,
+                      size: 14,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      "10 min",
+                      style: TextStyle(
+                        color: CustomerAppTheme.accentLime,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              prefixIcon:
-                  Icon(Icons.search, color: Color(0xFF9E9E9E), size: 20),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            ),
+            ],
           ),
         ),
-      ),
-      actions: [
         _buildCartIcon(),
         const SizedBox(width: 8),
         _buildUserIcon(),
@@ -103,34 +109,6 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       leadingWidth: 140,
-      flexibleSpace: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        child: Container(
-          height: 42,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(21),
-          ),
-          child: TextField(
-            onChanged: onSearchChanged,
-            style: const TextStyle(fontSize: 14),
-            decoration: const InputDecoration(
-              hintText: "Search groceries, vegetables, fruits & more...",
-              hintStyle: TextStyle(
-                color: Color(0xFF9E9E9E),
-                fontSize: 14,
-              ),
-              prefixIcon:
-                  Icon(Icons.search, color: Color(0xFF9E9E9E), size: 20),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-          ),
-        ),
-      ),
       actions: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
