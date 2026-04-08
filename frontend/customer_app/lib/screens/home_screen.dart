@@ -21,16 +21,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Product> _products = [];
+  List<Order> _orders = [];
   bool _isLoading = true;
   String? _error;
   final Map<String, int> _cart = {};
-  String _searchQuery = '';
   String _selectedCategory = 'All';
 
   @override
   void initState() {
     super.initState();
     _loadProducts();
+    _loadOrders();
   }
 
   Future<void> _loadProducts() async {
@@ -57,6 +58,22 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _loadOrders() async {
+    if (!widget.apiClient.isAuthenticated) return;
+
+    try {
+      final response = await widget.apiClient.get('/orders');
+      final orders = (response as List<dynamic>)
+          .map((entry) => Order.fromJson(entry as Map<String, dynamic>))
+          .toList();
+
+      if (!mounted) return;
+      setState(() {
+        _orders = orders;
+      });
+    } catch (_) {}
   }
 
   Future<bool> _promptLoginIfNeeded() async {
@@ -153,12 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final matchesCategory = _selectedCategory == 'All' ||
           (product.category ?? '').toLowerCase() ==
               _selectedCategory.toLowerCase();
-      final query = _searchQuery.trim().toLowerCase();
-      final matchesQuery = query.isEmpty ||
-          product.name.toLowerCase().contains(query) ||
-          (product.description ?? '').toLowerCase().contains(query) ||
-          (product.category ?? '').toLowerCase().contains(query);
-      return matchesCategory && matchesQuery;
+      return matchesCategory;
     }).toList();
   }
 
@@ -184,10 +196,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: Navbar(
         cartItemCount: _cartCount,
-        searchQuery: _searchQuery,
-        onSearchChanged: (value) {
-          setState(() => _searchQuery = value);
-        },
         onCartTap: _openCart,
         onUserTap: _handleAccountAction,
         isLoggedIn: widget.apiClient.isAuthenticated,
@@ -269,8 +277,10 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildYouMightNeedSection(columns, spacing),
               const SizedBox(height: 16),
               _buildWeeklyBestSellingSection(columns, spacing),
-              const SizedBox(height: 16),
-              _buildAppDownloadBanner(),
+              if (widget.apiClient.isAuthenticated && _orders.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _buildMyOrdersSection(),
+              ],
               const SizedBox(height: 16),
             ],
           );
@@ -665,6 +675,156 @@ class _HomeScreenState extends State<HomeScreen> {
                 onCartChanged: () => setState(() {}),
               );
             },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return const Color(0xFFFFA726);
+      case 'confirmed':
+      case 'shipped':
+      case 'delivered':
+        return CustomerAppTheme.primaryGreen;
+      case 'cancelled':
+        return CustomerAppTheme.danger;
+      default:
+        return CustomerAppTheme.textSecondary;
+    }
+  }
+
+  String _getDisplayStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Pending';
+      case 'confirmed':
+        return 'Confirmed';
+      case 'shipped':
+        return 'Shipped';
+      case 'delivered':
+        return 'Delivered';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
+    }
+  }
+
+  Widget _buildMyOrdersSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "My Orders",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: CustomerAppTheme.textPrimary,
+                ),
+              ),
+              TextButton(
+                onPressed: _openOrders,
+                style: TextButton.styleFrom(
+                  foregroundColor: CustomerAppTheme.primaryGreen,
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text(
+                  "View all",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _orders.length > 5 ? 5 : _orders.length,
+              itemBuilder: (context, index) {
+                final order = _orders[index];
+                return Container(
+                  width: 160,
+                  margin: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: CustomerAppTheme.cardBg,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 6,
+                        color: Colors.black.withValues(alpha: 0.05),
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '#${order.id.substring(0, 6)}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: CustomerAppTheme.textSecondary,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: _getStatusColor(order.status)
+                                  .withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              _getDisplayStatus(order.status),
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                                color: _getStatusColor(order.status),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '${order.items.length} items',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: CustomerAppTheme.textPrimary,
+                        ),
+                      ),
+                      Text(
+                        formatInr(order.totalAmount),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: CustomerAppTheme.primaryGreen,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
