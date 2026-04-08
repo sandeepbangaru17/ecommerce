@@ -140,10 +140,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _handleAccountAction() async {
     if (widget.apiClient.isAuthenticated) {
+      // Called from popup menu "Sign Out" option
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Sign Out'),
+          content: const Text('Are you sure you want to sign out?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+              child: const Text('Sign Out'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
       widget.apiClient.setToken(null);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Signed out')),
+        const SnackBar(content: Text('Signed out successfully')),
       );
       setState(() {});
       return;

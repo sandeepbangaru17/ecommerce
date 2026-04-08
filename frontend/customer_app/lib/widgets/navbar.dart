@@ -173,25 +173,78 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildUserIcon() {
-    return Tooltip(
-      message: isLoggedIn ? 'Sign Out' : 'Sign In',
-      child: GestureDetector(
-        onTap: onUserTap,
-        child: Container(
-          padding: const EdgeInsets.all(7),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white.withValues(alpha: isLoggedIn ? 0.6 : 0.3),
-              width: 1.5,
+    if (!isLoggedIn) {
+      return Tooltip(
+        message: 'Sign In',
+        child: GestureDetector(
+          onTap: onUserTap,
+          child: Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 1.5,
+              ),
+            ),
+            child: const Icon(
+              Icons.person_outline_rounded,
+              color: Colors.white,
+              size: 18,
             ),
           ),
-          child: Icon(
-            isLoggedIn ? Icons.person_rounded : Icons.person_outline_rounded,
-            color: Colors.white,
-            size: 18,
+        ),
+      );
+    }
+
+    // Logged in — show popup menu with options
+    return PopupMenuButton<String>(
+      tooltip: 'Account',
+      offset: const Offset(0, 48),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      color: Colors.white,
+      onSelected: (value) {
+        if (value == 'orders') onOrdersTap?.call();
+        if (value == 'signout') onUserTap?.call();
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: 'orders',
+          child: Row(
+            children: const [
+              Icon(Icons.receipt_long_outlined, size: 18, color: Color(0xFF2E7D32)),
+              SizedBox(width: 10),
+              Text('My Orders', style: TextStyle(fontSize: 14)),
+            ],
           ),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          value: 'signout',
+          child: Row(
+            children: const [
+              Icon(Icons.logout_rounded, size: 18, color: Colors.redAccent),
+              SizedBox(width: 10),
+              Text('Sign Out', style: TextStyle(fontSize: 14, color: Colors.redAccent)),
+            ],
+          ),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.all(7),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.2),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.6),
+            width: 1.5,
+          ),
+        ),
+        child: const Icon(
+          Icons.person_rounded,
+          color: Colors.white,
+          size: 18,
         ),
       ),
     );
