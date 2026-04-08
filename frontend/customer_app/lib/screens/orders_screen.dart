@@ -55,9 +55,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       case 'pending':
         return const Color(0xFFC67B1C);
       case 'confirmed':
-        return const Color(0xFF2D7DD2);
       case 'shipped':
-        return const Color(0xFF7551C2);
       case 'delivered':
         return CustomerAppTheme.success;
       case 'cancelled':
