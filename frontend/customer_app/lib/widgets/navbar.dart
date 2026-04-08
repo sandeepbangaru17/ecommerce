@@ -8,6 +8,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onCartTap;
   final VoidCallback? onUserTap;
   final VoidCallback? onMenuTap;
+  final VoidCallback? onOrdersTap;
   final bool isLoggedIn;
 
   const Navbar({
@@ -18,6 +19,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
     this.onCartTap,
     this.onUserTap,
     this.onMenuTap,
+    this.onOrdersTap,
     this.isLoggedIn = false,
   });
 
@@ -86,6 +88,8 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
         ),
+        _buildOrdersIcon(),
+        const SizedBox(width: 8),
         _buildCartIcon(),
         const SizedBox(width: 8),
         _buildUserIcon(),
@@ -145,6 +149,8 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         const SizedBox(width: 12),
+        _buildOrdersIcon(),
+        const SizedBox(width: 12),
         _buildCartIcon(),
         const SizedBox(width: 12),
         _buildUserIcon(),
@@ -191,6 +197,21 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildOrdersIcon() {
+    return InkWell(
+      onTap: onOrdersTap,
+      borderRadius: BorderRadius.circular(20),
+      child: const Padding(
+        padding: EdgeInsets.all(4),
+        child: Icon(
+          Icons.receipt_long_outlined,
+          color: Colors.white,
+          size: 22,
+        ),
       ),
     );
   }
