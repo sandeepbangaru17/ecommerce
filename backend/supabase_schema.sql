@@ -124,10 +124,35 @@ CREATE POLICY "Admins can update order items" ON public.order_items
     EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')
   );
 
--- Seed test products
-INSERT INTO public.products (name, description, price, stock, category) VALUES
-('Sample Product 1', 'A sample product for testing', 9.99, 100, 'Electronics'),
-('Sample Product 2', 'Another sample product', 19.99, 50, 'Electronics'),
-('Sample Product 3', 'Third sample product', 29.99, 25, 'Clothing'),
-('Sample Product 4', 'Fourth sample product', 39.99, 75, 'Clothing'),
-('Sample Product 5', 'Fifth sample product', 49.99, 0, 'Electronics');
+-- Seed grocery products
+INSERT INTO public.products (name, description, price, stock, category, image_url) VALUES
+('Fresh Organic Bananas', 'Premium quality organic bananas, rich in potassium and natural sweetness', 45.00, 100, 'Fruits', 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400'),
+('Red Tomatoes', 'Fresh and juicy red tomatoes, perfect for salads and cooking', 35.00, 80, 'Vegetables', 'https://images.unsplash.com/photo-1546470427-227c7369a9b9?w=400'),
+('Crispy Green Apples', 'Crisp and sweet green apples, naturally grown', 89.00, 60, 'Fruits', 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400'),
+('Fresh Spinach', 'Organic spinach leaves, rich in iron and vitamins', 25.00, 50, 'Vegetables', 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400'),
+('Dairy Milk', 'Pure and fresh dairy milk, 1 liter pack', 45.00, 120, 'Dairy', 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400'),
+('Farm Fresh Eggs', 'Dozen eggs from free-range farms', 60.00, 75, 'Dairy', 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400'),
+('Whole Wheat Bread', 'Freshly baked whole wheat bread', 35.00, 40, 'Bakery', 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400'),
+('Greek Yogurt', 'Creamy Greek yogurt, high protein content', 55.00, 65, 'Dairy', 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400'),
+('Orange Juice', 'Freshly squeezed orange juice, no preservatives', 79.00, 45, 'Beverages', 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400'),
+('Potato Chips', 'Crunchy and tasty potato chips, family pack', 30.00, 100, 'Snacks', 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=400'),
+('Green Chillies', 'Fresh green chillies, perfect for Indian cooking', 20.00, 70, 'Vegetables', 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400'),
+('Sweet Corn', 'Fresh sweet corn, naturally sweet and delicious', 25.00, 55, 'Vegetables', 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400'),
+('Fresh Pomegranate', 'Juicy pomegranate seeds, rich in antioxidants', 120.00, 40, 'Fruits', 'https://images.unsplash.com/photo-1541344999736-4a98982f342e?w=400'),
+('Onions', 'Fresh yellow onions, essential for every kitchen', 30.00, 200, 'Vegetables', 'https://images.unsplash.com/photo-1594263545717-0a9490187096?w=400'),
+('Garlic', 'Premium quality garlic, aromatic and flavorful', 40.00, 150, 'Vegetables', 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2f85?w=400'),
+('Fresh Ginger', 'Aromatic ginger roots, great for immunity', 35.00, 80, 'Vegetables', 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400'),
+('Coconut Oil', 'Pure coconut oil for cooking and hair care', 150.00, 35, 'Grocery', 'https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?w=400'),
+('Basmati Rice', 'Premium quality basmati rice, 5kg pack', 450.00, 45, 'Grocery', 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400'),
+('Toor Dal', 'Split pigeon pea lentils, protein rich', 120.00, 60, 'Grocery', 'https://images.unsplash.com/photo-1515543904323-de27c9fa4f20?w=400'),
+('Sugar', 'Fine quality sugar, 1kg pack', 45.00, 90, 'Grocery', 'https://images.unsplash.com/photo-1588832657487-8f4d3b4d2c2c?w=400'),
+('Salt', 'Premium iodized salt, 1kg pack', 25.00, 150, 'Grocery', 'https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?w=400'),
+('Instant Coffee', 'Smooth and aromatic instant coffee', 250.00, 40, 'Beverages', 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400'),
+('Green Tea', 'Natural green tea bags, antioxidant rich', 150.00, 55, 'Beverages', 'https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400'),
+('Butter', 'Premium quality butter, 500g pack', 180.00, 35, 'Dairy', 'https://images.unsplash.com/photo-1589985270958-bf087b4c9e9c?w=400'),
+('Paneer', 'Fresh cottage cheese, high protein', 220.00, 30, 'Dairy', 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=400'),
+('Chicken Breast', 'Boneless chicken breast, farm raised', 350.00, 25, 'Meat', 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=400'),
+('Fresh Fish', 'Freshwater fish, cleaned and ready to cook', 280.00, 20, 'Fish', 'https://images.unsplash.com/photo-1535400255456-bb5a8d96da66?w=400'),
+('Chocolate Biscuits', 'Crunchy chocolate biscuits, family pack', 35.00, 85, 'Snacks', 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400'),
+('Oats', 'Rolled oats for healthy breakfast', 85.00, 50, 'Grocery', 'https://images.unsplash.com/photo-1585238341267-1bc2afc6c81c?w=400'),
+('Peanut Butter', 'Creamy peanut butter, high protein', 199.00, 40, 'Grocery', 'https://images.unsplash.com/photo-1600189020946-7f68b1f07192?w=400');
