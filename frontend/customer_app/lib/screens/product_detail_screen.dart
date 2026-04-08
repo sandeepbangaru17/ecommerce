@@ -82,6 +82,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           apiClient: widget.apiClient,
           products: [widget.product],
           cart: _localCart,
+          onOrderPlaced: () {
+            Navigator.of(context).pop();
+          },
         ),
       ),
     );
