@@ -42,6 +42,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       if (!mounted) return;
 
       widget.apiClient.setToken(response['access_token'] as String);
+
+      final profile = await widget.apiClient.get('/auth/me') as Map<String, dynamic>;
+      if (!mounted) return;
+
+      if ((profile['role'] as String? ?? 'user') != 'admin') {
+        widget.apiClient.setToken(null);
+        throw ApiException(403, 'This account is not an admin account.');
+      }
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => AdminDashboardScreen(apiClient: widget.apiClient),
