@@ -126,11 +126,9 @@ class Order {
       case 'pending':
         return 'Pending';
       case 'confirmed':
-        return 'Confirmed';
       case 'shipped':
-        return 'Shipped';
       case 'delivered':
-        return 'Delivered';
+        return 'Success';
       case 'cancelled':
         return 'Cancelled';
       default:
