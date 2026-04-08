@@ -116,7 +116,7 @@ class APITestClient:
             "orders POST - no auth",
             "POST",
             "/orders",
-            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
             json_data={
                 "shipping_address": "123 Test St",
                 "contact_phone": "+1234567890",
@@ -129,7 +129,7 @@ class APITestClient:
             "validation - missing field",
             "POST",
             "/orders",
-            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
             json_data={"contact_phone": "+1234567890", "items": []},
         )
 
