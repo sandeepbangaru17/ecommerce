@@ -5,6 +5,8 @@ class ApiClient {
   static const String baseUrl = 'http://localhost:8000';
   String? _token;
 
+  bool get isAuthenticated => _token != null && _token!.isNotEmpty;
+
   void setToken(String? token) {
     _token = token;
   }
