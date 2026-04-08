@@ -123,6 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
           apiClient: widget.apiClient,
           products: _products,
           cart: _cart,
+          onOrderPlaced: () {
+            _loadOrders();
+          },
         ),
       ),
     );
