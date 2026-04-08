@@ -51,18 +51,40 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   Color _statusColor(String status) {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'pending':
-        return const Color(0xFFC67B1C);
+        return const Color(0xFFFFA726);
       case 'confirmed':
       case 'shipped':
       case 'delivered':
-        return CustomerAppTheme.success;
+      case 'success':
+        return CustomerAppTheme.primaryGreen;
       case 'cancelled':
         return CustomerAppTheme.danger;
       default:
-        return CustomerAppTheme.muted;
+        return CustomerAppTheme.textSecondary;
     }
+  }
+
+  String _getDisplayStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Pending';
+      case 'confirmed':
+        return 'Confirmed';
+      case 'shipped':
+        return 'Shipped';
+      case 'delivered':
+        return 'Delivered';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
+    }
+  }
+
+  String _formatOrderDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   Future<void> _openOrderDetail(Order order) async {
@@ -80,12 +102,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
             padding: const EdgeInsets.all(16),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 760),
+                constraints: const BoxConstraints(maxWidth: 500),
                 child: Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(32),
+                    color: CustomerAppTheme.cardBg,
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: SingleChildScrollView(
                     child: Column(
@@ -96,71 +118,138 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           children: [
                             Expanded(
                               child: Text(
-                                'Order #${shortOrderLabel(detailOrder.id)}',
-                                style: Theme.of(context).textTheme.headlineMedium,
+                                'Order #${order.id.substring(0, 8)}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: CustomerAppTheme.textPrimary,
+                                ),
                               ),
                             ),
-                            _StatusChip(
-                              label: detailOrder.statusDisplay,
-                              color: _statusColor(detailOrder.status),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: _statusColor(detailOrder.status)
+                                    .withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                _getDisplayStatus(detailOrder.status),
+                                style: TextStyle(
+                                  color: _statusColor(detailOrder.status),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 18),
-                        _DetailRow(
-                          label: 'Total',
-                          value: formatInr(detailOrder.totalAmount),
-                        ),
-                        _DetailRow(
-                          label: 'Shipping',
-                          value: detailOrder.shippingAddress,
-                        ),
-                        _DetailRow(
-                          label: 'Phone',
-                          value: detailOrder.contactPhone,
-                        ),
-                        if ((detailOrder.notes ?? '').isNotEmpty)
-                          _DetailRow(
-                            label: 'Notes',
-                            value: detailOrder.notes!,
-                          ),
                         const SizedBox(height: 16),
-                        Text(
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              size: 18,
+                              color: CustomerAppTheme.textSecondary,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                detailOrder.shippingAddress,
+                                style: const TextStyle(
+                                  color: CustomerAppTheme.textSecondary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.phone_outlined,
+                              size: 18,
+                              color: CustomerAppTheme.textSecondary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              detailOrder.contactPhone,
+                              style: const TextStyle(
+                                color: CustomerAppTheme.textSecondary,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 24),
+                        const Text(
                           'Items',
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: CustomerAppTheme.textPrimary,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         ...detailOrder.items.map(
                           (item) => Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: CustomerAppTheme.primary.withValues(alpha: 0.04),
-                              borderRadius: BorderRadius.circular(20),
+                              color: CustomerAppTheme.addCartBg,
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
                               children: [
                                 Expanded(
                                   child: Text(
-                                    item.productName ?? 'Product ${shortOrderLabel(item.productId)}',
+                                    item.productName ?? 'Product',
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: CustomerAppTheme.text,
+                                      fontWeight: FontWeight.w600,
+                                      color: CustomerAppTheme.textPrimary,
                                     ),
                                   ),
                                 ),
-                                Text('Qty ${item.quantity}'),
-                                const SizedBox(width: 14),
                                 Text(
-                                  formatInr(item.unitPrice),
+                                  'x${item.quantity}',
                                   style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: CustomerAppTheme.primary,
+                                    color: CustomerAppTheme.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  formatInr(item.unitPrice * item.quantity),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: CustomerAppTheme.primaryGreen,
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Total',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              formatInr(detailOrder.totalAmount),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: CustomerAppTheme.primaryGreen,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -177,18 +266,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Orders')),
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFFFFBF5),
-              CustomerAppTheme.canvas,
-            ],
-          ),
-        ),
+      appBar: AppBar(
+        title: const Text('My Orders'),
+        backgroundColor: CustomerAppTheme.primaryGreen,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: Container(
+        color: CustomerAppTheme.pageBg,
         child: _buildBody(),
       ),
     );
@@ -196,7 +281,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(
+          color: CustomerAppTheme.primaryGreen,
+        ),
+      );
     }
 
     if (_error != null) {
@@ -206,6 +295,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: CustomerAppTheme.danger,
+              ),
+              const SizedBox(height: 16),
               Text(
                 _error!,
                 textAlign: TextAlign.center,
@@ -213,6 +308,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadOrders,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomerAppTheme.primaryGreen,
+                ),
                 child: const Text('Retry'),
               ),
             ],
@@ -222,147 +320,146 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
 
     if (_orders.isEmpty) {
-      return const Center(
-        child: Text(
-          'No orders yet',
-          style: TextStyle(
-            color: CustomerAppTheme.text,
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-          ),
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 64,
+              color: CustomerAppTheme.textSecondary,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No orders yet',
+              style: TextStyle(
+                color: CustomerAppTheme.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Start shopping to see your orders here!',
+              style: TextStyle(
+                color: CustomerAppTheme.textSecondary,
+              ),
+            ),
+          ],
         ),
       );
     }
 
     return RefreshIndicator(
       onRefresh: _loadOrders,
-      child: ListView.separated(
-        padding: const EdgeInsets.all(24),
-        itemCount: _orders.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 16),
-        itemBuilder: (context, index) {
-          final order = _orders[index];
-          return Card(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(28),
-              onTap: () => _openOrderDetail(order),
-              child: Padding(
-                padding: const EdgeInsets.all(22),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final stacked = constraints.maxWidth < 620;
-                    final info = [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Order #${shortOrderLabel(order.id)}',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Placed ${order.createdAt.toLocal().toString().split('.').first}',
-                            ),
-                          ],
-                        ),
+      color: CustomerAppTheme.primaryGreen,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth > 600;
+          final crossAxisCount = isWide ? 2 : 1;
+
+          return GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: isWide ? 2.5 : 2.8,
+            ),
+            itemCount: _orders.length,
+            itemBuilder: (context, index) {
+              final order = _orders[index];
+              return GestureDetector(
+                onTap: () => _openOrderDetail(order),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: CustomerAppTheme.cardBg,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 12,
+                        color: Colors.black.withValues(alpha: 0.06),
+                        offset: const Offset(0, 4),
                       ),
-                      const SizedBox(width: 18, height: 18),
-                      Column(
-                        crossAxisAlignment: stacked
-                            ? CrossAxisAlignment.start
-                            : CrossAxisAlignment.end,
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
-                          _StatusChip(
-                            label: order.statusDisplay,
-                            color: _statusColor(order.status),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _statusColor(order.status),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              _getDisplayStatus(order.status),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 12),
+                          const Spacer(),
                           Text(
-                            formatInr(order.totalAmount),
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: CustomerAppTheme.primary,
-                                ),
+                            '#${order.id.substring(0, 8)}',
+                            style: const TextStyle(
+                              color: CustomerAppTheme.textSecondary,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
-                    ];
-
-                    return stacked
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: info,
-                          )
-                        : Row(children: info);
-                  },
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.shopping_bag_outlined,
+                            size: 16,
+                            color: CustomerAppTheme.textSecondary,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${order.items.length} items',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: CustomerAppTheme.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        formatInr(order.totalAmount),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: CustomerAppTheme.primaryGreen,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatOrderDate(order.createdAt),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: CustomerAppTheme.textSecondary
+                              .withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
-      ),
-    );
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _StatusChip({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _DetailRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 88,
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: CustomerAppTheme.muted,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: CustomerAppTheme.text,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
