@@ -1,220 +1,225 @@
 <div align="center">
 
-# 🛍️ Modern E-Commerce Platform
+<img src="https://img.shields.io/badge/Gromuse-Grocery%20Delivery-2E7D32?style=for-the-badge&logoColor=white" alt="Gromuse" />
 
-A production-ready E-commerce system powered by a robust **FastAPI backend** and elegant **Flutter frontends**.
+# Gromuse — Grocery Delivery Platform
 
-[![Python Version](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+A full-stack grocery delivery application with a customer-facing shopping app, a dedicated admin portal, and a production-ready REST API.
+
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Flutter](https://img.shields.io/badge/Flutter-3.0+-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
 
 </div>
 
 ---
 
-## ✨ Features
+## Live Deployments
 
-- **Blazing Fast API**: Built with FastAPI for optimal performance and asynchronous processing.
-- **Cross-Platform Apps**: Includes both a Customer Mobile App and a dedicated Admin Portal built with Flutter.
-- **Secure Authentication**: Integrated with Supabase for robust and secure user management.
-- **Seamless Database**: Fully functional relational database design ready for scale.
-- **Interactive UI/UX**: Crafted carefully to deliver a premium shopping and management experience.
-
----
-
-## 🛠️ Prerequisites
-
-Before you begin, ensure you have met the following requirements:
-- **Python 3.10+**
-- **Node.js** (for Flutter web support if applicable)
-- **Git**
-- **Supabase Account** (for database & authentication)
+| App | URL | Description |
+|---|---|---|
+| Customer App | [gromuse-customer.vercel.app](https://gromuse-customer.vercel.app) | Shopping app for customers |
+| Admin Portal | [web-six-mauve-jq4hzgblkq.vercel.app](https://web-six-mauve-jq4hzgblkq.vercel.app) | Store management dashboard |
+| Backend API | [gromuse-backend.onrender.com/docs](https://gromuse-backend.onrender.com/docs) | Interactive API docs |
 
 ---
 
-## 🚀 Quick Start Guide
+## Overview
 
-### 1. Clone the Repository
+Gromuse is a production-deployed grocery delivery platform. Customers can browse products, add to cart, and place orders with cash-on-delivery. Store admins manage the product catalog and update order statuses through a dedicated portal.
 
-```bash
-git clone https://github.com/sandeepbangaru17/ecommerce.git
-cd ecommerce
+---
+
+## Features
+
+**Customer App**
+- Browse products by category with real product images
+- Search and filter by category
+- Add to cart, adjust quantities, checkout with address + phone
+- View full order history with status tracking
+- Cash on delivery with free delivery above ₹499
+
+**Admin Portal**
+- Secure admin login
+- Add, edit, hide/show products with image URL support
+- View and manage all customer orders
+- Update order status (Pending → Confirmed → Shipped → Delivered)
+
+**Backend API**
+- FastAPI with async endpoints
+- JWT authentication (custom, not Supabase Auth)
+- Supabase PostgreSQL database with Row Level Security
+- Role-based access control (user / admin)
+- Full order lifecycle management
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | FastAPI, Python 3.11, Uvicorn |
+| Database | Supabase (PostgreSQL) |
+| Auth | Custom JWT via python-jose + Supabase Auth |
+| Customer App | Flutter (Web + Android) |
+| Admin Portal | Flutter Web |
+| Hosting | Render (API), Vercel (Flutter Web) |
+
+---
+
+## Project Structure
+
+```
+ecommerce/
+├── backend/
+│   ├── app/
+│   │   ├── api/            # Route handlers (auth, products, orders)
+│   │   ├── core/           # Config, Supabase client
+│   │   ├── schemas/        # Pydantic models
+│   │   └── services/       # Auth logic, database service
+│   ├── Procfile            # Render/Railway deployment
+│   ├── runtime.txt         # Python version pin
+│   └── requirements.txt
+├── frontend/
+│   ├── customer_app/       # Flutter customer shopping app
+│   └── admin_portal/       # Flutter admin dashboard
+└── README.md
 ```
 
-### 2. Backend Setup
+---
 
-Set up your Python virtual environment and install dependencies:
+## API Reference
+
+Full interactive docs available at [`/docs`](https://gromuse-backend.onrender.com/docs).
+
+| Endpoint | Method | Auth | Description |
+|---|---|---|---|
+| `/health` | GET | — | Health check |
+| `/auth/signup` | POST | — | Register new customer |
+| `/auth/login` | POST | — | Login, returns JWT |
+| `/auth/me` | GET | User | Get current user info |
+| `/products` | GET | — | List products (filterable) |
+| `/products/{id}` | GET | — | Get single product |
+| `/products` | POST | Admin | Create product |
+| `/products/{id}` | PUT | Admin | Update product |
+| `/products/{id}` | DELETE | Admin | Delete product |
+| `/orders` | POST | User | Place order |
+| `/orders` | GET | User | Get my orders |
+| `/orders/{id}` | GET | User | Get order detail |
+| `/orders/{id}/status` | PUT | Admin | Update order status |
+
+---
+
+## Order Lifecycle
+
+```
+Pending → Confirmed → Shipped → Delivered
+    └──────────────────────────→ Cancelled
+```
+
+---
+
+## Local Development
+
+### Prerequisites
+- Python 3.11+
+- Flutter SDK
+- Supabase project
+
+### Backend
 
 ```bash
 cd backend
-
-# Create and activate virtual environment
 python -m venv venv
-
-# Windows:
-venv\Scripts\activate
-# Linux/Mac:
-source venv/bin/activate
-
-# Install required packages
+venv\Scripts\activate        # Windows
 pip install -r requirements.txt
+copy .env.example .env       # Fill in your Supabase credentials
+uvicorn app.main:app --reload --port 8000
 ```
 
-### 3. Database & Supabase Integration
-
-1. Navigate to [Supabase](https://supabase.com) and create a new project.
-2. Open the **SQL Editor** in your Supabase dashboard.
-3. Execute the schema script located at `backend/supabase_schema.sql`.
-
-### 4. Environment Configuration
-
-Duplicate the example environment file and configure it:
-
-```bash
-copy .env.example .env
-```
-
-Update `.env` with your Supabase credentials (found under **Settings → API**):
+`.env` variables required:
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-anon-key
 SUPABASE_SERVICE_KEY=your-service-role-key
-JWT_SECRET=your-secret-key
+JWT_SECRET=your-long-random-secret
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+ALLOWED_ORIGINS=*
 ```
 
-### 5. Launch the Backend API
+### Flutter Apps
 
 ```bash
-cd backend
-uvicorn app.main:app --reload --port 8000
-```
-> **🌍 API is live at:** `http://localhost:8000`
-
----
-
-## 🧪 Testing the API
-
-### Automated Testing (CLI)
-Run our comprehensive CLI test suite:
-```bash
-cd backend
-python cli_test_client.py
-```
-
-### Manual Testing with cURL
-```bash
-# Verify API Health
-curl http://localhost:8000/health
-
-# Fetch All Products
-curl http://localhost:8000/products
-
-# Register a New User
-curl -X POST http://localhost:8000/auth/signup \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@test.com","password":"password123"}'
-```
-
----
-
-## 📱 Running the Flutter Applications
-
-Install Flutter from [flutter.dev](https://flutter.dev/docs/get-started/install) and add it to your PATH.
-
-### Customer Mobile Application
-```bash
+# Customer App
 cd frontend/customer_app
 flutter pub get
-flutter run
-```
+flutter run -d chrome --dart-define=API_URL=http://localhost:8000
 
-### Admin Portal
-```bash
+# Admin Portal
 cd frontend/admin_portal
 flutter pub get
-flutter run
+flutter run -d chrome --dart-define=API_URL=http://localhost:8000
 ```
 
 ---
 
-## 🏗️ Project Architecture
+## Deployment
 
-```graphql
-ecommerce/
-├── backend/
-│   ├── app/
-│   │   ├── api/          # 🌐 FastAPI route definitions
-│   │   ├── core/         # ⚙️ Application configs & settings
-│   │   ├── schemas/      # 📄 Pydantic validation models
-│   │   └── services/     # 🧠 Core business logic
-│   ├── cli_test_client.py
-│   ├── requirements.txt
-│   └── supabase_schema.sql
-├── frontend/
-│   ├── customer_app/     # 👗 Flutter mobile application
-│   └── admin_portal/     # 📊 Flutter dashboard for admins
-└── README.md             # 📖 You are here
+### Backend → Render
+- Root Directory: `backend`
+- Build Command: `pip install -r requirements.txt`
+- Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Add all `.env` variables in Render's Environment tab
+
+### Flutter Web → Vercel
+
+```bash
+flutter build web --dart-define=API_URL=https://your-backend.onrender.com
+cd build/web
+vercel --prod
+```
+
+### Android APK
+
+```bash
+cd frontend/customer_app
+flutter build apk --split-per-abi --dart-define=API_URL=https://your-backend.onrender.com
+# Output: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
 ---
 
-## 📡 API Reference
-
-A brief overview of the exposed endpoints. Discover the full interactive documentation at `http://localhost:8000/docs` after starting the server.
-
-| Endpoint | Method | Auth Required | Description |
-| :--- | :---: | :---: | :--- |
-| `/health` | `GET` | ❌ | Subsystem health validation |
-| `/products` | `GET` | ❌ | Retrieve a list of all products |
-| `/products/{id}` | `GET` | ❌ | Fetch specific product details |
-| `/auth/signup` | `POST` | ❌ | Register a new customer |
-| `/auth/login` | `POST` | ❌ | Authenticate and obtain JWT |
-| `/orders` | `POST` | 🔒 | Place a new customer order |
-| `/orders` | `GET` | 🔒 | Retrieve user order history |
-| `/orders/{id}` | `GET` | 🔒 | Get specifics of a single order |
-| `/orders/{id}/status`| `PUT` | 🛡️ (Admin) | Update an order's state |
-
----
-
-## 🔄 Order Lifecycle
-
-```mermaid
-graph LR
-    A[Pending] --> B[Confirmed]
-    B --> C[Shipped]
-    C --> D[Delivered]
-    A --> E[Cancelled]
-    B --> E
-```
-*(Orders usually flow from Pending → Confirmed → Shipped → Delivered. Cancellations can occur before shipping)*
-
----
-
-## 🚨 Troubleshooting
+## Troubleshooting
 
 <details>
-<summary><b>Flutter: command not found</b></summary>
-Ensure Flutter is properly downloaded, extracted, and its `bin` directory is successfully added to your system's `PATH` variable. Check out the <a href="https://flutter.dev/docs/get-started/install">official guide</a> for more details.
+<summary>Users can't register — "email rate limit exceeded"</summary>
+
+Go to **Supabase → Authentication → Providers → Email** and disable **"Confirm email"**. The free tier limits confirmation emails to 3/hour.
 </details>
 
 <details>
-<summary><b>Python Module not found</b></summary>
-Make sure your virtual environment is actively running before installing requirements or starting the server:
-<br><br>
-<b>Windows:</b> <code>venv\Scripts\activate</code><br>
-<b>Unix:</b> <code>source venv/bin/activate</code>
+<summary>Backend cold start delay on first request</summary>
+
+Render's free tier spins down after 15 minutes of inactivity. The first request after idle takes ~30 seconds to wake up. This is expected on the free plan.
 </details>
 
 <details>
-<summary><b>Supabase Connection Errors</b></summary>
-Double-check your <code>.env</code> file. Missing variables or incorrect URL/Key pairs are the typical culprits. Ensure you have copied strings exactly as they appear in your Supabase dashboard settings.
+<summary>Flutter app shows wrong API URL</summary>
+
+The API URL is baked in at build time via `--dart-define=API_URL=...`. Rebuild and redeploy both Flutter apps whenever the backend URL changes.
+</details>
+
+<details>
+<summary>Admin can't see all products</summary>
+
+The admin portal calls `/products` with no filter so all products (including hidden ones) are visible. The customer app calls `/products?is_active=true` to show only active products.
 </details>
 
 ---
 
 <div align="center">
-  <p>Released under the <b>MIT License</b>.</p>
+  <sub>Built with FastAPI · Flutter · Supabase</sub>
 </div>
