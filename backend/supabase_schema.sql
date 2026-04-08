@@ -123,3 +123,6 @@ CREATE POLICY "Admins can update order items" ON public.order_items
   FOR UPDATE USING (
     EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')
   );
+
+-- Clear any existing products (run this separately if needed)
+-- DELETE FROM public.products WHERE true;
