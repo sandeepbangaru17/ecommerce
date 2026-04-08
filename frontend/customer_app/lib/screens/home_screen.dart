@@ -200,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: Navbar(
         cartItemCount: _cartCount,
         onCartTap: _openCart,
+        onOrdersTap: _openOrders,
         onUserTap: _handleAccountAction,
         isLoggedIn: widget.apiClient.isAuthenticated,
       ),
@@ -280,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildYouMightNeedSection(columns, spacing),
               const SizedBox(height: 16),
               _buildWeeklyBestSellingSection(columns, spacing),
-              if (widget.apiClient.isAuthenticated && _orders.isNotEmpty) ...[
+              if (widget.apiClient.isAuthenticated) ...[
                 const SizedBox(height: 16),
                 _buildMyOrdersSection(),
               ],
