@@ -540,7 +540,7 @@ class _ProductsTabState extends State<ProductsTab> {
                       crossAxisCount: columns,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: columns == 1 ? 1.4 : columns == 2 ? 0.88 : 0.82,
+                      childAspectRatio: columns == 1 ? 0.85 : columns == 2 ? 0.88 : 0.82,
                     ),
                     itemCount: visibleProducts.length,
                     itemBuilder: (context, index) {
