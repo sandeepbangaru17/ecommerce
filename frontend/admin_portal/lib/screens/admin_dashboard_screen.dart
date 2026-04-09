@@ -648,7 +648,7 @@ class _ProductsTabState extends State<ProductsTab> {
         );
       },
     );
-  } }
+  }
 }
 
 class OrdersTab extends StatefulWidget {
