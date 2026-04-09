@@ -540,7 +540,7 @@ class _ProductsTabState extends State<ProductsTab> {
                       crossAxisCount: columns,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: columns == 1 ? 1.5 : 1.1,
+                      childAspectRatio: columns == 1 ? 1.4 : columns == 2 ? 0.88 : 0.82,
                     ),
                     itemCount: visibleProducts.length,
                     itemBuilder: (context, index) {
@@ -555,7 +555,7 @@ class _ProductsTabState extends State<ProductsTab> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  height: 156,
+                                  height: 130,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(24),
                                     color: Colors.white.withValues(alpha: 0.04),
@@ -608,7 +608,7 @@ class _ProductsTabState extends State<ProductsTab> {
                                 const SizedBox(height: 10),
                                 Text(
                                   product.description ?? 'No description added',
-                                  maxLines: 3,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(color: AdminAppTheme.muted),
                                 ),
@@ -627,8 +627,8 @@ class _ProductsTabState extends State<ProductsTab> {
                                     Expanded(
                                       child: Text(
                                         product.imageUrl?.isNotEmpty == true
-                                            ? 'Remote media attached'
-                                            : 'Local premium artwork fallback',
+                                            ? 'Custom image set'
+                                            : 'Auto emoji artwork',
                                         style: const TextStyle(color: AdminAppTheme.muted),
                                       ),
                                     ),
