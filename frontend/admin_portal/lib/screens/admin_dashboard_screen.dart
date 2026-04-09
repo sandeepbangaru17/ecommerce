@@ -420,8 +420,11 @@ class _ProductsTabState extends State<ProductsTab> {
                 ? 2
                 : 1;
 
-        return Column(
-          children: [
+        return RefreshIndicator(
+          onRefresh: _loadProducts,
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
             Wrap(
               spacing: 16,
               runSpacing: 16,
@@ -512,9 +515,8 @@ class _ProductsTabState extends State<ProductsTab> {
             ),
             const SizedBox(height: 18),
             if (visibleProducts.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Padding(
+              Center(
+                child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -529,13 +531,12 @@ class _ProductsTabState extends State<ProductsTab> {
                     ),
                   ),
                 ),
-              )
+                ),
             else
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _loadProducts,
-                  child: GridView.builder(
-                    padding: const EdgeInsets.only(bottom: 12),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 12),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: columns,
                       crossAxisSpacing: 16,
@@ -643,11 +644,9 @@ class _ProductsTabState extends State<ProductsTab> {
                           ),
                         ),
                       );
-                    },
                   ),
-                ),
-              ),
-          ],
+            ],
+          ),
         );
       },
     );
