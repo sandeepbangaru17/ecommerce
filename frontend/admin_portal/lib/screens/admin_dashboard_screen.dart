@@ -372,9 +372,7 @@ class _ProductsTabState extends State<ProductsTab> {
         },
       ),
     );
-  }
-
-  @override
+  }  @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -425,98 +423,98 @@ class _ProductsTabState extends State<ProductsTab> {
           child: ListView(
             padding: const EdgeInsets.only(bottom: 24),
             children: [
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                SizedBox(
-                  width: constraints.maxWidth >= 760 ? (constraints.maxWidth - 32) / 3 : constraints.maxWidth,
-                  child: _AdminMetricCard(
-                    label: 'Catalog value',
-                    value: formatInr(totalValue),
-                    icon: Icons.currency_rupee,
-                  ),
-                ),
-                SizedBox(
-                  width: constraints.maxWidth >= 760 ? (constraints.maxWidth - 32) / 3 : constraints.maxWidth,
-                  child: _AdminMetricCard(
-                    label: 'Active products',
-                    value: '$activeProducts',
-                    icon: Icons.check_circle_outline,
-                  ),
-                ),
-                SizedBox(
-                  width: constraints.maxWidth >= 760 ? (constraints.maxWidth - 32) / 3 : constraints.maxWidth,
-                  child: _AdminMetricCard(
-                    label: 'Total products',
-                    value: '${_products.length}',
-                    icon: Icons.inventory_2_outlined,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    LayoutBuilder(
-                      builder: (context, box) {
-                        final stacked = box.maxWidth < 860;
-                        final search = TextField(
-                          onChanged: (value) => setState(() => _searchQuery = value),
-                          decoration: const InputDecoration(
-                            hintText: 'Search catalog, category, or description',
-                            prefixIcon: Icon(Icons.search_rounded),
-                          ),
-                        );
-                        final createButton = ElevatedButton.icon(
-                          onPressed: () => _showProductDialog(),
-                          icon: const Icon(Icons.add_rounded),
-                          label: const Text('Add product'),
-                        );
-                        return stacked
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  search,
-                                  const SizedBox(height: 12),
-                                  createButton,
-                                ],
-                              )
-                            : Row(
-                                children: [
-                                  Expanded(child: search),
-                                  const SizedBox(width: 14),
-                                  createButton,
-                                ],
-                              );
-                      },
+              Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  SizedBox(
+                    width: constraints.maxWidth >= 760 ? (constraints.maxWidth - 32) / 3 : constraints.maxWidth,
+                    child: _AdminMetricCard(
+                      label: 'Catalog value',
+                      value: formatInr(totalValue),
+                      icon: Icons.currency_rupee,
                     ),
-                    const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: _categories
-                          .map(
-                            (category) => ChoiceChip(
-                              label: Text(category),
-                              selected: _selectedCategory == category,
-                              onSelected: (_) => setState(() => _selectedCategory = category),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth >= 760 ? (constraints.maxWidth - 32) / 3 : constraints.maxWidth,
+                    child: _AdminMetricCard(
+                      label: 'Active products',
+                      value: '$activeProducts',
+                      icon: Icons.check_circle_outline,
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth >= 760 ? (constraints.maxWidth - 32) / 3 : constraints.maxWidth,
+                    child: _AdminMetricCard(
+                      label: 'Total products',
+                      value: '${_products.length}',
+                      icon: Icons.inventory_2_outlined,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LayoutBuilder(
+                        builder: (context, box) {
+                          final stacked = box.maxWidth < 860;
+                          final search = TextField(
+                            onChanged: (value) => setState(() => _searchQuery = value),
+                            decoration: const InputDecoration(
+                              hintText: 'Search catalog, category, or description',
+                              prefixIcon: Icon(Icons.search_rounded),
                             ),
-                          )
-                          .toList(),
-                    ),
-                  ],
+                          );
+                          final createButton = ElevatedButton.icon(
+                            onPressed: () => _showProductDialog(),
+                            icon: const Icon(Icons.add_rounded),
+                            label: const Text('Add product'),
+                          );
+                          return stacked
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    search,
+                                    const SizedBox(height: 12),
+                                    createButton,
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    Expanded(child: search),
+                                    const SizedBox(width: 14),
+                                    createButton,
+                                  ],
+                                );
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: _categories
+                            .map(
+                              (category) => ChoiceChip(
+                                label: Text(category),
+                                selected: _selectedCategory == category,
+                                onSelected: (_) => setState(() => _selectedCategory = category),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 18),
-            if (visibleProducts.isEmpty)
-              Center(
-                child: Padding(
+              const SizedBox(height: 18),
+              if (visibleProducts.isEmpty)
+                Center(
+                  child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -530,127 +528,127 @@ class _ProductsTabState extends State<ProductsTab> {
                       ],
                     ),
                   ),
-                ),
-                ),
-            else
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 12),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: columns,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: columns == 1 ? 0.85 : columns == 2 ? 0.88 : 0.82,
-                    ),
-                    itemCount: visibleProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = visibleProducts[index];
-                      return Card(
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(28),
-                          onTap: () => _showProductDialog(product: product),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  height: 130,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(24),
-                                    color: Colors.white.withValues(alpha: 0.04),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      Positioned.fill(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: ProductArtwork(
-                                            product: product,
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 12),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: columns,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: columns == 1 ? 0.85 : columns == 2 ? 0.88 : 0.82,
+                  ),
+                  itemCount: visibleProducts.length,
+                  itemBuilder: (context, index) {
+                    final product = visibleProducts[index];
+                    return Card(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(28),
+                        onTap: () => _showProductDialog(product: product),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 130,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(24),
+                                  color: Colors.white.withValues(alpha: 0.04),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: ProductArtwork(
+                                          product: product,
+                                          borderRadius: BorderRadius.circular(20),
                                         ),
                                       ),
-                                      Positioned(
-                                        left: 12,
-                                        top: 12,
-                                        child: _StatusBadge(
-                                          label: product.isActive ? 'Live' : 'Hidden',
-                                          color: product.isActive
-                                              ? AdminAppTheme.secondary
-                                              : AdminAppTheme.danger,
-                                        ),
+                                    ),
+                                    Positioned(
+                                      left: 12,
+                                      top: 12,
+                                      child: _StatusBadge(
+                                        label: product.isActive ? 'Live' : 'Hidden',
+                                        color: product.isActive
+                                            ? AdminAppTheme.secondary
+                                            : AdminAppTheme.danger,
                                       ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      product.name,
+                                      style: Theme.of(context).textTheme.titleLarge,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        product.name,
-                                        style: Theme.of(context).textTheme.titleLarge,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                                  Text(
+                                    formatInr(product.price),
+                                    style: const TextStyle(
+                                      color: AdminAppTheme.primary,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 20,
                                     ),
-                                    Text(
-                                      formatInr(product.price),
-                                      style: const TextStyle(
-                                        color: AdminAppTheme.primary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 20,
-                                      ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                product.description ?? 'No description added',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: AdminAppTheme.muted),
+                              ),
+                              const Spacer(),
+                              Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: [
+                                  Chip(label: Text(product.category ?? 'General')),
+                                  Chip(label: Text('Stock ${product.stock}')),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      product.imageUrl?.isNotEmpty == true
+                                          ? 'Custom image set'
+                                          : 'Auto emoji artwork',
+                                      style: const TextStyle(color: AdminAppTheme.muted),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  product.description ?? 'No description added',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: AdminAppTheme.muted),
-                                ),
-                                const Spacer(),
-                                Wrap(
-                                  spacing: 10,
-                                  runSpacing: 10,
-                                  children: [
-                                    Chip(label: Text(product.category ?? 'General')),
-                                    Chip(label: Text('Stock ${product.stock}')),
-                                  ],
-                                ),
-                                const SizedBox(height: 14),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        product.imageUrl?.isNotEmpty == true
-                                            ? 'Custom image set'
-                                            : 'Auto emoji artwork',
-                                        style: const TextStyle(color: AdminAppTheme.muted),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => _showProductDialog(product: product),
-                                      child: const Text('Edit'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => _showProductDialog(product: product),
+                                    child: const Text('Edit'),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                  ),
+                      ),
+                    );
+                  },
+                ),
             ],
           ),
         );
       },
     );
-  }
+  } }
 }
 
 class OrdersTab extends StatefulWidget {
